@@ -2,58 +2,93 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
+    use HasFactory;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
+        'shop_id',
         'name',
-        'unit',
-        'category',
-        'threshold',
         'description',
-        'is_active'
+        'unit',
+        'min_stock_level',
+        'current_stock',
+        'avg_cost',
+        'sale_price',
+        'avg_bag_weight',
+        'total_bags',
+        'user_id',
     ];
 
-    protected $casts = [
-        'threshold' => 'decimal:2',
-        'is_active' => 'boolean'
-    ];
-
-    public function stockEntries(): HasMany
+    /**
+     * Get the shop that owns the product.
+     */
+    public function shop()
     {
-        return $this->hasMany(StockEntry::class);
+        return $this->belongsTo(Shop::class);
     }
 
-    public function stockChecks(): HasMany
+    /**
+     * Get the user who created the product.
+     */
+    public function user()
     {
-        return $this->hasMany(StockCheck::class);
+        return $this->belongsTo(User::class);
     }
 
-    public function avgConsumptionCache()
+    /**
+     * Get the stock ins for the product.
+     */
+    public function stockIns()
     {
-        return $this->hasOne(AvgConsumptionCache::class);
+        return $this->hasMany(StockIn::class);
     }
 
-    // Calculate current system stock
-    public function getCurrentSystemStock(): float
+    /**
+     * Get the stock checks for the product.
+     */
+    public function stockChecks()
     {
-        return $this->stockEntries()
-            ->selectRaw('SUM(CASE WHEN entry_type = "in" THEN quantity ELSE -quantity END) as total')
-            ->value('total') ?? 0;
+        return $this->hasMany(DailyStockCheck::class);
     }
 
-    // Get latest physical stock check
-    public function getLatestPhysicalStock(): ?float
+    /**
+     * Get the sale items for the product.
+     */
+    public function saleItems()
     {
-        $latestCheck = $this->stockChecks()->latest('check_date')->first();
-        return $latestCheck ? $latestCheck->physical_quantity : null;
+        return $this->hasMany(SaleItem::class);
     }
 
-    // Check if stock is below threshold
-    public function isBelowThreshold(): bool
+    /**
+     * Check if product is low on stock.
+     */
+    public function isLowStock()
     {
-        return $this->getCurrentSystemStock() < $this->threshold;
+        return $this->current_stock > 0 && $this->current_stock <= $this->min_stock_level;
+    }
+
+    /**
+     * Check if product is out of stock.
+     */
+    public function isOutOfStock()
+    {
+        return $this->current_stock <= 0;
+    }
+
+    /**
+     * Get the total value of current stock.
+     */
+    public function getCurrentStockValue()
+    {
+        return $this->current_stock * $this->avg_cost;
     }
 }

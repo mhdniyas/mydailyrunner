@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
+        <title>{{ $title ?? 'Shop Manager' }} - {{ config('app.name', 'Shop Stock & Financial Manager') }}</title>
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+        
+        <!-- FontAwesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
+        <!-- Chart.js for analytics -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <body class="font-sans antialiased bg-primary-50">
+        <div class="min-h-screen flex">
+            <!-- Mobile menu overlay -->
+            <div id="mobile-menu-overlay" 
+                 class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden transition-opacity duration-300 ease-in-out"></div>
+            
+            <!-- Sidebar -->
+            <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 transform -translate-x-full lg:translate-x-0 w-64 bg-primary-900 shadow-luxury-lg transition-transform duration-300 ease-in-out z-50 lg:z-auto">
+                <div class="flex flex-col h-full">
+                    <!-- Logo with close button -->
+                    <div class="flex items-center justify-between h-20 bg-primary-800 border-b border-primary-700 px-4">
+                        <h1 class="font-serif text-xl lg:text-2xl font-bold text-white">
+                            {{ session('current_shop_name') ?? 'Shop Manager' }}
+                        </h1>
+                        <!-- Mobile close button inside sidebar -->
+                        <button id="sidebar-close-button" 
+                                class="lg:hidden p-2 rounded-md text-primary-200 hover:text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-accent-500 transition-colors duration-200">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Navigation -->
+                    <nav class="flex-1 px-4 py-6 space-y-2">
+                        <a href="{{ route('dashboard') }}" 
+                           class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('dashboard') ? 'bg-accent-600 text-white' : '' }}">
+                            <i class="fas fa-chart-line mr-3"></i>
+                            Dashboard
+                        </a>
+                        
+                        <a href="{{ route('stock-ins.index') }}" 
+                           class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('stock-ins.*') ? 'bg-accent-600 text-white' : '' }}">
+                            <i class="fas fa-boxes-stacked mr-3"></i>
+                            Stock In
+                        </a>
+                        
+                        <a href="{{ route('daily-stock-checks.index') }}" 
+                           class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('daily-stock-checks.*') ? 'bg-accent-600 text-white' : '' }}">
+                            <i class="fas fa-clipboard-check mr-3"></i>
+                            Daily Stock Check
+                        </a>
+                        
+                        <a href="{{ route('sales.index') }}" 
+                           class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('sales.*') ? 'bg-accent-600 text-white' : '' }}">
+                            <i class="fas fa-receipt mr-3"></i>
+                            Sales
+                        </a>
+                        
+                        <a href="{{ route('customer-payments.index') }}" 
+                           class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('customer-payments.*') ? 'bg-accent-600 text-white' : '' }}">
+                            <i class="fas fa-users mr-3"></i>
+                            Customer Payments
+                        </a>
+                        
+                        <a href="{{ route('financial-entries.index') }}" 
+                           class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('financial-entries.*') ? 'bg-accent-600 text-white' : '' }}">
+                            <i class="fas fa-money-bill-wave mr-3"></i>
+                            Finance
+                        </a>
+                        
+                        <div class="px-4 py-3">
+                            <h5 class="text-xs uppercase font-semibold text-primary-400 tracking-wider">Reports</h5>
+                        </div>
+                        
+                        <a href="{{ route('reports.stock') }}" 
+                           class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('reports.stock') ? 'bg-accent-600 text-white' : '' }}">
+                            <i class="fas fa-boxes mr-3"></i>
+                            Stock Report
+                        </a>
+                        
+                        <a href="{{ route('reports.discrepancy') }}" 
+                           class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('reports.discrepancy') ? 'bg-accent-600 text-white' : '' }}">
+                            <i class="fas fa-exclamation-triangle mr-3"></i>
+                            Discrepancy Report
+                        </a>
+                        
+                        <a href="{{ route('reports.financial') }}" 
+                           class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('reports.financial') ? 'bg-accent-600 text-white' : '' }}">
+                            <i class="fas fa-chart-bar mr-3"></i>
+                            Financial Report
+                        </a>
+                        
+                        <a href="{{ route('reports.customer-dues') }}" 
+                           class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('reports.customer-dues') ? 'bg-accent-600 text-white' : '' }}">
+                            <i class="fas fa-hand-holding-usd mr-3"></i>
+                            Customer Dues
+                        </a>
+                        
+                        <a href="{{ route('reports.bag-weights') }}" 
+                           class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('reports.bag-weights') ? 'bg-accent-600 text-white' : '' }}">
+                            <i class="fas fa-weight-hanging mr-3"></i>
+                            Bag Weights
+                        </a>
+                        
+                        <div class="px-4 py-3">
+                            <h5 class="text-xs uppercase font-semibold text-primary-400 tracking-wider">Setup</h5>
+                        </div>
+                        
+                        <a href="{{ route('products.index') }}" 
+                           class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('products.*') ? 'bg-accent-600 text-white' : '' }}">
+                            <i class="fas fa-box mr-3"></i>
+                            Products
+                        </a>
+
+                        @if(Auth::user()->hasRole('owner'))
+                        <a href="{{ route('users.index') }}" 
+                           class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('users.*') ? 'bg-accent-600 text-white' : '' }}">
+                            <i class="fas fa-user-shield mr-3"></i>
+                            User Management
+                        </a>
+                        
+                        <a href="{{ route('shops.index') }}" 
+                           class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('shops.*') ? 'bg-accent-600 text-white' : '' }}">
+                            <i class="fas fa-store mr-3"></i>
+                            Shop Management
+                        </a>
+                        @endif
+
+                        <div class="border-t border-primary-700 my-4"></div>
+
+                        @if(Auth::user()->shops->count() > 1)
+                        <a href="{{ route('shops.select') }}" 
+                           class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200">
+                            <i class="fas fa-store mr-3"></i> 
+                            Switch Shop
+                        </a>
+                        @endif
+
+                        <form method="POST" action="{{ route('logout') }}" class="mt-4">
+                            @csrf
+                            <button type="submit" 
+                                    class="flex items-center w-full px-4 py-3 text-primary-200 rounded-lg hover:bg-red-600 hover:text-white transition-colors duration-200">
+                                <i class="fas fa-sign-out-alt mr-3"></i>
+                                Logout
+                            </button>
+                        </form>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="flex-1 flex flex-col min-w-0 lg:ml-0">
+                <!-- Top Bar -->
+                <header class="bg-white shadow-sm border-b border-primary-100">
+                    <div class="flex items-center justify-between px-4 lg:px-6 py-4">
+                        <div class="flex items-center">
+                            <!-- Mobile menu button -->
+                            <button id="mobile-menu-button" 
+                                    class="mobile-menu-button lg:hidden mr-4">
+                                <!-- Hamburger icon -->
+                                <svg id="menu-icon" class="h-6 w-6 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                                <!-- Close icon (hidden by default) -->
+                                <svg id="close-icon" class="h-6 w-6 hidden transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                            
+                            <div>
+                                <h2 class="font-serif text-xl lg:text-2xl font-semibold text-primary-900">
+                                    {{ $title ?? 'Dashboard' }}
+                                </h2>
+                                @if(isset($subtitle))
+                                    <p class="text-primary-600 mt-1 text-sm lg:text-base hidden sm:block">{{ $subtitle }}</p>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-2 lg:space-x-4">
+                            <div class="text-right hidden sm:block">
+                                <p class="text-sm font-medium text-primary-900">{{ Auth::user()->name }}</p>
+                                <p class="text-xs text-primary-500">{{ ucfirst(session('current_shop_role') ?? 'User') }}</p>
+                            </div>
+                            <div class="w-8 h-8 lg:w-10 lg:h-10 bg-accent-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white text-sm lg:text-base"></i>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Page Content -->
+                <main class="flex-1 p-4 lg:p-6 overflow-x-auto">
+                    {{ $slot }}
+                </main>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation JavaScript -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const mobileMenuButton = document.getElementById('mobile-menu-button');
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('mobile-menu-overlay');
+                const menuIcon = document.getElementById('menu-icon');
+                const closeIcon = document.getElementById('close-icon');
+                const sidebarCloseButton = document.getElementById('sidebar-close-button');
+                
+                let isMenuOpen = false;
+                let startX = 0;
+                let currentX = 0;
+                let isDragging = false;
+                
+                function openMobileMenu() {
+                    sidebar.classList.remove('-translate-x-full');
+                    overlay.classList.remove('hidden');
+                    document.body.classList.add('overflow-hidden', 'lg:overflow-auto');
+                    menuIcon.classList.add('hidden');
+                    closeIcon.classList.remove('hidden');
+                    mobileMenuButton.classList.add('bg-primary-100', 'text-primary-900');
+                    isMenuOpen = true;
+                }
+                
+                function closeMobileMenu() {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                    document.body.classList.remove('overflow-hidden', 'lg:overflow-auto');
+                    menuIcon.classList.remove('hidden');
+                    closeIcon.classList.add('hidden');
+                    mobileMenuButton.classList.remove('bg-primary-100', 'text-primary-900');
+                    isMenuOpen = false;
+                }
+                
+                function toggleMobileMenu() {
+                    if (isMenuOpen) {
+                        closeMobileMenu();
+                    } else {
+                        openMobileMenu();
+                    }
+                }
+                
+                // Event listeners for menu toggle
+                mobileMenuButton.addEventListener('click', toggleMobileMenu);
+                overlay.addEventListener('click', closeMobileMenu);
+                sidebarCloseButton.addEventListener('click', closeMobileMenu);
+                
+                // Close menu on navigation
+                const navLinks = sidebar.querySelectorAll('nav a, nav button[type="submit"]');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        if (window.innerWidth < 1024 && isMenuOpen) {
+                            setTimeout(closeMobileMenu, 150);
+                        }
+                    });
+                });
+                
+                // Window resize handler
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth >= 1024 && isMenuOpen) {
+                        closeMobileMenu();
+                    }
+                });
+                
+                // Keyboard support
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape' && isMenuOpen) {
+                        closeMobileMenu();
+                    }
+                });
+                
+                // Touch gesture support
+                sidebar.addEventListener('touchstart', function(e) {
+                    startX = e.touches[0].clientX;
+                    isDragging = true;
+                    e.stopPropagation();
+                });
+                
+                sidebar.addEventListener('touchmove', function(e) {
+                    if (!isDragging) return;
+                    currentX = e.touches[0].clientX;
+                    const diffX = startX - currentX;
+                    
+                    if (diffX > 50 && isMenuOpen) {
+                        closeMobileMenu();
+                        isDragging = false;
+                    }
+                    e.stopPropagation();
+                });
+                
+                sidebar.addEventListener('touchend', function(e) {
+                    isDragging = false;
+                    e.stopPropagation();
+                });
+                
+                // Prevent body scroll when menu is open
+                document.body.addEventListener('touchmove', function(e) {
+                    if (isMenuOpen && window.innerWidth < 1024) {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+            });
+        </script>
+    </body>
+</html>

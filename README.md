@@ -59,4 +59,79 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# mydailyrunner
+
+# MorningCricket Inventory System
+
+A multi-shop inventory and financial management system built with Laravel, Filament, and Tailwind CSS.
+
+## 🌟 Features
+
+- Multi-shop management with role-based access control
+- Complete inventory tracking with bag average calculations
+- Daily stock checks and discrepancy reporting
+- Sales and customer payment tracking
+- Financial management with categorized income/expense tracking
+- Comprehensive reporting system
+
+## 🏗️ System Architecture
+
+### Core Modules
+
+1. **Shop Management**
+   - Multi-tenant architecture
+   - Shop-specific settings and configurations
+
+2. **User Management**
+   - Role-based access control
+   - Per-shop role assignment
+   - Supported roles: Owner, Manager, Stock Checker, Finance, Viewer
+
+3. **Inventory Management**
+   - Product management
+   - Stock-in tracking
+   - Bag average calculations
+   - Daily physical stock checks
+
+4. **Sales System**
+   - Customer management
+   - Sales tracking
+   - Payment status monitoring
+
+5. **Financial Management**
+   - Income/Expense tracking
+   - Categorized transactions
+   - Financial reporting
+
+6. **Reporting**
+   - Stock summary reports
+   - Financial statements
+   - Discrepancy reports
+   - Customer payment status
+
+## 🔧 Technical Stack
+
+- **Backend:** Laravel 12.x
+- **Admin Panel:** FilamentPHP
+- **Frontend:** Tailwind CSS + Alpine.js
+- **Authentication:** Laravel Breeze
+- **Permissions:** Spatie Laravel Permission + Filament Shield
+- **Database:** MySQL
+- **Reporting:** Laravel Excel / DomPDF
+
+## 🔐 Role Permissions
+
+| Module             | Owner | Manager | Stock Checker | Finance | Viewer |
+|-------------------|-------|---------|---------------|---------|--------|
+| View Shop Data    | ✅    | ✅      | ✅            | ✅      | ✅     |
+| Manage Products   | ✅    | ✅      | ❌            | ❌      | ❌     |
+| Stock In          | ✅    | ✅      | ❌            | ❌      | ❌     |
+| Daily Stock Check | ✅    | ✅      | ✅            | ❌      | ❌     |
+| View Stock Reports| ✅    | ✅      | ✅            | ❌      | ✅     |
+| Sales Entry       | ✅    | ✅      | ❌            | ✅      | ❌     |
+| Financial Entry   | ✅    | ✅      | ❌            | ✅      | ❌     |
+| Financial Reports | ✅    | ✅      | ❌            | ✅      | ✅     |
+| Manage Users      | ✅    | ❌      | ❌            | ❌      | ❌     |
+
+## 🚀 Setup Instructions
+
+[Installation instructions will be added during setup]
