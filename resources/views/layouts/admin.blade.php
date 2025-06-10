@@ -152,12 +152,24 @@
             }
             
             /* Dropdown menu styles */
+            .dropdown-section {
+                position: relative;
+                overflow: visible; /* Allow dropdown to expand outside */
+            }
+            
+            .dropdown-button {
+                position: relative;
+                z-index: 2;
+            }
+            
             .dropdown-content {
                 max-height: 0;
                 overflow: hidden;
                 transition: max-height 0.3s ease-out, opacity 0.3s ease;
                 opacity: 0;
                 pointer-events: none;
+                position: relative;
+                z-index: 1;
             }
             
             .dropdown-content.show {
@@ -736,16 +748,29 @@
                 
                 dropdownButtons.forEach(button => {
                     button.addEventListener('click', function(e) {
-                        e.preventDefault(); // Prevent default behavior
-                        e.stopPropagation(); // Prevent event bubbling
+                        // Don't use preventDefault to avoid button movement
+                        e.stopPropagation(); // Just prevent event bubbling
                         
-                        // Get the dropdown content
+                        // Get the dropdown content and chevron
                         const content = this.nextElementSibling;
                         const chevron = this.querySelector('.dropdown-chevron');
+                        
+                        // Save the button's position before toggling
+                        const buttonRect = this.getBoundingClientRect();
+                        const buttonTop = buttonRect.top;
                         
                         // Toggle show class
                         content.classList.toggle('show');
                         chevron.classList.toggle('rotate');
+                        
+                        // Restore button position if needed
+                        setTimeout(() => {
+                            const newButtonRect = this.getBoundingClientRect();
+                            if (newButtonRect.top !== buttonTop) {
+                                // If position changed, scroll to restore it
+                                window.scrollBy(0, newButtonRect.top - buttonTop);
+                            }
+                        }, 10);
                         
                         // Close other dropdowns
                         dropdownButtons.forEach(otherButton => {
@@ -764,8 +789,12 @@
                     if (button.classList.contains('nav-active') || button.querySelector('.nav-active')) {
                         const content = button.nextElementSibling;
                         const chevron = button.querySelector('.dropdown-chevron');
-                        content.classList.add('show');
-                        chevron.classList.add('rotate');
+                        
+                        // Use a small timeout to allow proper rendering
+                        setTimeout(() => {
+                            content.classList.add('show');
+                            chevron.classList.add('rotate');
+                        }, 100);
                     }
                 });
                 
