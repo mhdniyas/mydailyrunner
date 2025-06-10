@@ -49,26 +49,12 @@ class Kernel extends HttpKernel
      * The application's middleware aliases.
      *
      * Aliases may be used instead of class names to conveniently assign middleware to routes and groups.
+     * 
+     * Note: In Laravel 12, middleware aliases are registered in bootstrap/app.php
      *
      * @var array<string, class-string|string>
      */
     protected $middlewareAliases = [
-        'auth' => \App\Http\Middleware\Authenticate::class,
-        'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
-        'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
-        'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
-        'can' => \Illuminate\Auth\Middleware\Authorize::class,
-        'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
-        'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
-        'precognitive' => \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
-        'signed' => \App\Http\Middleware\ValidateSignature::class,
-        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'shop.selected' => \App\Http\Middleware\EnsureShopSelected::class,
-        'shop.role' => \App\Http\Middleware\CheckShopRole::class,
-        'owner' => \App\Http\Middleware\CheckShopRole::class.':owner',
-        'manager' => \App\Http\Middleware\CheckShopRole::class.':owner,manager',
-        'finance' => \App\Http\Middleware\CheckShopRole::class.':owner,manager,finance',
-        'stock' => \App\Http\Middleware\CheckShopRole::class.':owner,manager,stock',
-    ],
-};
+        // Middleware aliases are now registered in bootstrap/app.php
+    ];
+}

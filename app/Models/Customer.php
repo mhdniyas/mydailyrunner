@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Customer extends Model
 {
@@ -15,11 +17,15 @@ class Customer extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'shop_id',
         'name',
         'phone',
         'address',
+        'ration_card_number',
+        'card_type',
+        'notes',
         'is_walk_in',
+        'shop_id',
+        'user_id',
     ];
 
     /**
@@ -34,7 +40,7 @@ class Customer extends Model
     /**
      * Get the shop that owns the customer.
      */
-    public function shop()
+    public function shop(): BelongsTo
     {
         return $this->belongsTo(Shop::class);
     }
@@ -42,28 +48,31 @@ class Customer extends Model
     /**
      * Get the sales for the customer.
      */
-    public function sales()
+    public function sales(): HasMany
     {
         return $this->hasMany(Sale::class);
     }
 
     /**
-     * Get the total amount due from this customer.
+     * Get the user who created the customer.
      */
-    public function getTotalDue()
+    public function user(): BelongsTo
     {
-        return $this->sales()
-            ->where('status', '!=', 'paid')
-            ->sum('due_amount');
+        return $this->belongsTo(User::class);
     }
 
     /**
-     * Get the count of pending sales for this customer.
+     * Get the card type display name.
      */
-    public function getPendingSalesCount()
+    public function getCardTypeDisplayAttribute(): string
     {
-        return $this->sales()
-            ->where('status', '!=', 'paid')
-            ->count();
+        return match($this->card_type) {
+            'AAY' => 'AAY (Yellow)',
+            'PHH' => 'PHH (Pink)',
+            'NPS' => 'NPS (Blue)',
+            'NPI' => 'NPI (Light Blue)',
+            'NPNS' => 'NPNS (White)',
+            default => 'Not Specified'
+        };
     }
 }

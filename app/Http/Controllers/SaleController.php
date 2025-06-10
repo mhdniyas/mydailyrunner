@@ -116,6 +116,12 @@ class SaleController extends Controller
         DB::beginTransaction();
         
         try {
+            // Verify the shop belongs to the user
+            $userShop = auth()->user()->shops()->where('id', $shopId)->first();
+            if (!$userShop) {
+                throw new \Exception('You do not have access to this shop.');
+            }
+            
             // Create sale
             $sale = Sale::create([
                 'shop_id' => $shopId,
@@ -146,6 +152,7 @@ class SaleController extends Controller
                     'quantity' => $quantity,
                     'price' => $price,
                     'subtotal' => $subtotal,
+                    'user_id' => Auth::id(),
                 ]);
                 
                 // Update product stock

@@ -7,11 +7,14 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\StockInController;
 use App\Http\Controllers\DailyStockCheckController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerPaymentController;
 use App\Http\Controllers\FinancialEntryController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -30,6 +33,23 @@ Route::middleware(['auth'])->group(function () {
         return view('shops.create-app');
     })->name('shops.create.first');
     
+    // Subscription management routes
+    Route::prefix('subscription')->name('subscription.')->group(function () {
+        Route::get('/status', [SubscriptionController::class, 'status'])->name('status');
+        Route::get('/request', [SubscriptionController::class, 'requestForm'])->name('request');
+        Route::post('/request', [SubscriptionController::class, 'submitRequest'])->name('submit');
+        Route::post('/cancel', [SubscriptionController::class, 'cancel'])->name('cancel');
+    });
+    
+    // Admin routes for managing subscriptions
+    Route::middleware(['subscription-admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/subscriptions', [AdminController::class, 'subscriptions'])->name('subscriptions.index');
+        Route::get('/subscriptions/pending', [AdminController::class, 'pendingApprovals'])->name('subscriptions.pending');
+        Route::post('/subscriptions/{user}/approve', [AdminController::class, 'approveSubscription'])->name('subscriptions.approve');
+        Route::post('/subscriptions/{user}/reject', [AdminController::class, 'rejectSubscription'])->name('subscriptions.reject');
+        Route::post('/subscriptions/{user}/toggle', [AdminController::class, 'toggleSubscription'])->name('subscriptions.toggle');
+    });
+    
     // Shop resource routes
     Route::resource('shops', ShopController::class);
 
@@ -40,7 +60,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Add shop.selected middleware to all routes that require a shop to be selected
-    Route::middleware(['shop.selected'])->group(function () {
+    Route::middleware(['shop.selected', 'subscribed'])->group(function () {
         // Product routes
         Route::resource('products', ProductController::class);
         
@@ -59,6 +79,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/customer-payments', [CustomerPaymentController::class, 'index'])->name('customer-payments.index');
         Route::get('/customer-payments/create/{sale}', [CustomerPaymentController::class, 'create'])->name('customer-payments.create');
         Route::post('/customer-payments', [CustomerPaymentController::class, 'store'])->name('customer-payments.store');
+        
+        // Customer routes
+        Route::resource('customers', CustomerController::class);
         
         // Financial Entry routes
         Route::resource('financial-entries', FinancialEntryController::class);

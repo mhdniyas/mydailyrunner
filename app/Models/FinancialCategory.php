@@ -19,6 +19,7 @@ class FinancialCategory extends Model
         'name',
         'type',
         'description',
+        'user_id',
     ];
 
     /**
@@ -51,5 +52,13 @@ class FinancialCategory extends Model
     public function isExpense()
     {
         return $this->type === 'expense';
+    }
+
+    /**
+     * Get the user who created the category.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

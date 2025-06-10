@@ -25,5 +25,7 @@ class MiddlewareServiceProvider extends ServiceProvider
         
         $router->aliasMiddleware('shop.selected', \App\Http\Middleware\EnsureShopSelected::class);
         $router->aliasMiddleware('owner', \App\Http\Middleware\EnsureUserIsOwner::class);
+        $router->aliasMiddleware('admin', \App\Http\Middleware\AdminMiddleware::class);
+        $router->aliasMiddleware('subscribed', \App\Http\Middleware\SubscriptionMiddleware::class);
     }
 }

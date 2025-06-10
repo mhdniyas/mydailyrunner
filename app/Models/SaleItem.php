@@ -20,6 +20,7 @@ class SaleItem extends Model
         'quantity',
         'price',
         'subtotal',
+        'user_id',
     ];
 
     /**
@@ -36,5 +37,13 @@ class SaleItem extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * Get the user who created the sale item.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

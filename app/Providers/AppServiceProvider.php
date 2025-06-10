@@ -21,6 +21,16 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\App\Http\Middleware\EnsureShopSelected::class, function ($app) {
             return new \App\Http\Middleware\EnsureShopSelected();
         });
+        
+        // Bind AdminMiddleware
+        $this->app->bind(\App\Http\Middleware\AdminMiddleware::class, function ($app) {
+            return new \App\Http\Middleware\AdminMiddleware();
+        });
+        
+        // Bind SubscriptionMiddleware
+        $this->app->bind(\App\Http\Middleware\SubscriptionMiddleware::class, function ($app) {
+            return new \App\Http\Middleware\SubscriptionMiddleware();
+        });
     }
 
     /**

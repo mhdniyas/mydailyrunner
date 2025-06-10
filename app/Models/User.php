@@ -23,6 +23,8 @@ class User extends Authenticatable
         'password',
         'invitation_token',
         'last_login_at',
+        'is_subscribed',
+        'is_admin_approved',
     ];
 
     /**
@@ -44,6 +46,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'last_login_at' => 'datetime',
+        'is_subscribed' => 'boolean',
+        'is_admin_approved' => 'boolean',
     ];
 
     /**
@@ -122,5 +126,28 @@ class User extends Authenticatable
         }
 
         return in_array($shopUser->role, $roles);
+    }
+
+    /**
+     * Check if user is a system administrator.
+     * 
+     * @return bool
+     */
+    public function isAdmin()
+    {
+        // In this implementation, we're considering users with 'admin' role
+        // in any shop to be system administrators
+        return $this->shopUsers()->where('role', 'admin')->exists();
+    }
+    
+    /**
+     * Check if user has subscription approval rights.
+     * 
+     * @return bool
+     */
+    public function canApproveSubscriptions()
+    {
+        // Only users with admin role can approve subscriptions
+        return $this->isAdmin();
     }
 }

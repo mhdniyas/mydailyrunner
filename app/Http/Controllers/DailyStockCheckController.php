@@ -152,6 +152,13 @@ class DailyStockCheckController extends Controller
                 ->with('error', ucfirst($validated['check_type']) . ' check already completed today.');
         }
         
+        // Verify the shop belongs to the user
+        $userShop = auth()->user()->shops()->where('id', $shopId)->first();
+        if (!$userShop) {
+            return redirect()->route('daily-stock-checks.index')
+                ->with('error', 'You do not have access to this shop.');
+        }
+        
         // Process each product
         $productIds = $request->input('product_id');
         $systemStocks = $request->input('system_stock');

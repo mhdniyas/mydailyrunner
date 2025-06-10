@@ -8,14 +8,14 @@
                 <form action="{{ route('reports.bag-weights') }}" method="GET" class="flex flex-wrap items-center gap-2">
                     <select name="product_id" class="border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">
                         <option value="">All Products</option>
-                        @foreach($allProducts as $product)
-                            <option value="{{ $product->id }}" {{ $selectedProduct == $product->id ? 'selected' : '' }}>
+                        @foreach($products as $product)
+                            <option value="{{ $product->id }}" {{ isset($selectedProduct) && $selectedProduct == $product->id ? 'selected' : '' }}>
                                 {{ $product->name }}
                             </option>
                         @endforeach
                     </select>
-                    <input type="date" name="from_date" value="{{ $from_date }}" class="border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">
-                    <input type="date" name="to_date" value="{{ $to_date }}" class="border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">
+                    <input type="date" name="from_date" value="{{ $from_date ?? now()->subDays(30)->format('Y-m-d') }}" class="border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">
+                    <input type="date" name="to_date" value="{{ $to_date ?? now()->format('Y-m-d') }}" class="border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">
                     <button type="submit" class="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700">
                         <i class="fas fa-filter"></i> Filter
                     </button>
@@ -59,10 +59,10 @@
                                     {{ number_format($product->avg_bag_weight, 2) }} {{ $product->unit }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    {{ number_format($product->min_bag_weight, 2) }} {{ $product->unit }}
+                                    {{ number_format($product->min_bag_weight ?? 0, 2) }} {{ $product->unit }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    {{ number_format($product->max_bag_weight, 2) }} {{ $product->unit }}
+                                    {{ number_format($product->max_bag_weight ?? 0, 2) }} {{ $product->unit }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <button type="button" class="text-primary-600 hover:text-primary-900 view-history-btn" data-product-id="{{ $product->id }}">
@@ -84,7 +84,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody class="bg-white divide-y divide-gray-200">
-                                                @foreach($product->stockIns as $stockIn)
+                                                @foreach($product->stockIns ?? [] as $stockIn)
                                                     <tr>
                                                         <td class="px-4 py-2 whitespace-nowrap">{{ $stockIn->created_at->format('M d, Y') }}</td>
                                                         <td class="px-4 py-2 whitespace-nowrap">{{ $stockIn->id }}</td>
@@ -143,8 +143,8 @@
             const bagWeightChart = new Chart(bagWeightCtx, {
                 type: 'line',
                 data: {
-                    labels: {!! json_encode($chartLabels) !!},
-                    datasets: {!! json_encode($chartDatasets) !!}
+                    labels: {!! json_encode($chartLabels ?? []) !!},
+                    datasets: {!! json_encode($chartDatasets ?? []) !!}
                 },
                 options: {
                     responsive: true,

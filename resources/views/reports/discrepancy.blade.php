@@ -14,15 +14,15 @@
                             </option>
                         @endforeach
                     </select>
-                    <input type="date" name="from_date" value="{{ $from_date }}" class="border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">
-                    <input type="date" name="to_date" value="{{ $to_date }}" class="border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">
+                    <input type="date" name="from_date" value="{{ $fromDate }}" class="border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">
+                    <input type="date" name="to_date" value="{{ $toDate }}" class="border-gray-300 focus:border-primary-500 focus:ring-primary-500 rounded-md shadow-sm">
                     <button type="submit" class="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700">
                         <i class="fas fa-filter"></i> Filter
                     </button>
                 </form>
             </div>
             <div>
-                <a href="{{ route('export.pdf', 'discrepancy') }}?product_id={{ $selectedProduct }}&from_date={{ $from_date }}&to_date={{ $to_date }}" class="bg-accent-600 text-white px-4 py-2 rounded-md hover:bg-accent-700">
+                <a href="{{ route('export.pdf', 'discrepancy') }}?product_id={{ $selectedProduct }}&from_date={{ $fromDate }}&to_date={{ $toDate }}" class="bg-accent-600 text-white px-4 py-2 rounded-md hover:bg-accent-700">
                     <i class="fas fa-file-export mr-2"></i> Export
                 </a>
             </div>
@@ -32,15 +32,15 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div class="bg-primary-50 p-4 rounded-md">
                 <p class="text-sm text-primary-600 font-medium">Total Discrepancies</p>
-                <p class="text-2xl font-bold mt-1">{{ $discrepancyCount }}</p>
+                <p class="text-2xl font-bold mt-1">{{ $discrepancies->count() }}</p>
             </div>
             <div class="bg-red-50 p-4 rounded-md">
                 <p class="text-sm text-red-600 font-medium">Negative Discrepancies</p>
-                <p class="text-2xl font-bold mt-1">{{ $negativeCount }}</p>
+                <p class="text-2xl font-bold mt-1">{{ $discrepancies->where('discrepancy', '<', 0)->count() }}</p>
             </div>
             <div class="bg-green-50 p-4 rounded-md">
                 <p class="text-sm text-green-600 font-medium">Positive Discrepancies</p>
-                <p class="text-2xl font-bold mt-1">{{ $positiveCount }}</p>
+                <p class="text-2xl font-bold mt-1">{{ $discrepancies->where('discrepancy', '>', 0)->count() }}</p>
             </div>
         </div>
 

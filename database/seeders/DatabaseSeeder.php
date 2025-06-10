@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
         // Call other seeders
         $this->call([
             DefaultCategoriesSeeder::class,
+            AdminRoleSeeder::class,
         ]);
     }
 }

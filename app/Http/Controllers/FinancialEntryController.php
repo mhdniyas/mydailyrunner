@@ -129,6 +129,14 @@ class FinancialEntryController extends Controller
                 ->with('error', 'Category type does not match entry type.');
         }
         
+        // Verify the shop belongs to the user
+        $userShop = auth()->user()->shops()->where('id', $shopId)->first();
+        if (!$userShop) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'You do not have access to this shop.');
+        }
+        
         // Create financial entry
         FinancialEntry::create([
             'shop_id' => $shopId,

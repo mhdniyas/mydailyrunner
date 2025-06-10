@@ -7,6 +7,7 @@ use App\Models\Sale;
 use App\Models\StockIn;
 use App\Models\DailyStockCheck;
 use App\Models\FinancialEntry;
+use App\Models\FinancialCategory;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -130,12 +131,27 @@ class ReportController extends Controller
         $fromDate = $request->from_date ?? now()->startOfMonth()->format('Y-m-d');
         $toDate = $request->to_date ?? now()->format('Y-m-d');
         
+        // Get selected type (all, income, or expense)
+        $selectedType = $request->type ?? 'all';
+        
         // Get financial entries
-        $entries = FinancialEntry::where('shop_id', $shopId)
-            ->whereBetween('entry_date', [$fromDate, $toDate])
-            ->with('category')
+        $query = FinancialEntry::where('shop_id', $shopId)
+            ->whereBetween('entry_date', [$fromDate, $toDate]);
+            
+        // Filter by type if not 'all'
+        if ($selectedType !== 'all') {
+            $query->where('type', $selectedType);
+        }
+        
+        // Filter by category if provided
+        $selectedCategory = $request->category_id ?? null;
+        if ($selectedCategory) {
+            $query->where('financial_category_id', $selectedCategory);
+        }
+        
+        $entries = $query->with('category')
             ->orderBy('entry_date', 'desc')
-            ->get();
+            ->paginate(15);
             
         // Get sales income
         $sales = Sale::where('shop_id', $shopId)
@@ -145,14 +161,24 @@ class ReportController extends Controller
             
         // Calculate summary stats
         $totalSalesIncome = $sales->sum('paid_amount');
-        $totalOtherIncome = $entries->where('type', 'income')->sum('amount');
+        $totalOtherIncome = FinancialEntry::where('shop_id', $shopId)
+            ->where('type', 'income')
+            ->whereBetween('entry_date', [$fromDate, $toDate])
+            ->sum('amount');
         $totalIncome = $totalSalesIncome + $totalOtherIncome;
         
-        $totalExpenses = $entries->where('type', 'expense')->sum('amount');
+        $totalExpenses = FinancialEntry::where('shop_id', $shopId)
+            ->where('type', 'expense')
+            ->whereBetween('entry_date', [$fromDate, $toDate])
+            ->sum('amount');
         $netProfit = $totalIncome - $totalExpenses;
         
         // Group expenses by category
-        $expensesByCategory = $entries->where('type', 'expense')
+        $expensesByCategory = FinancialEntry::where('shop_id', $shopId)
+            ->where('type', 'expense')
+            ->whereBetween('entry_date', [$fromDate, $toDate])
+            ->with('category')
+            ->get()
             ->groupBy('financial_category_id')
             ->map(function ($items) {
                 return [
@@ -162,6 +188,49 @@ class ReportController extends Controller
             })
             ->sortByDesc('amount')
             ->values();
+            
+        // Get categories for filter
+        $categories = FinancialCategory::where('shop_id', $shopId)
+            ->orderBy('name')
+            ->get();
+            
+        // Prepare chart data
+        $chartLabels = [];
+        $incomeData = [];
+        $expenseData = [];
+        
+        // Generate chart data by day for the selected period
+        $startDate = \Carbon\Carbon::parse($fromDate);
+        $endDate = \Carbon\Carbon::parse($toDate);
+        $currentDate = $startDate->copy();
+        
+        while ($currentDate->lte($endDate)) {
+            $dateStr = $currentDate->format('Y-m-d');
+            $chartLabels[] = $currentDate->format('M d');
+            
+            // Get income for this day
+            $dayIncome = FinancialEntry::where('shop_id', $shopId)
+                ->where('type', 'income')
+                ->whereDate('entry_date', $dateStr)
+                ->sum('amount');
+                
+            // Add sales income for this day
+            $daySalesIncome = Sale::where('shop_id', $shopId)
+                ->whereDate('sale_date', $dateStr)
+                ->sum('paid_amount');
+                
+            $incomeData[] = $dayIncome + $daySalesIncome;
+            
+            // Get expenses for this day
+            $dayExpense = FinancialEntry::where('shop_id', $shopId)
+                ->where('type', 'expense')
+                ->whereDate('entry_date', $dateStr)
+                ->sum('amount');
+                
+            $expenseData[] = $dayExpense;
+            
+            $currentDate->addDay();
+        }
             
         return view('reports.financial', [
             'entries' => $entries,
@@ -174,6 +243,16 @@ class ReportController extends Controller
             'totalExpenses' => $totalExpenses,
             'netProfit' => $netProfit,
             'expensesByCategory' => $expensesByCategory,
+            'categories' => $categories,
+            'selectedType' => $selectedType,
+            'selectedCategory' => $selectedCategory,
+            'chartLabels' => $chartLabels,
+            'incomeData' => $incomeData,
+            'expenseData' => $expenseData,
+            'from_date' => $fromDate,
+            'to_date' => $toDate,
+            'totalExpense' => $totalExpenses,
+            'netBalance' => $netProfit,
             'title' => 'Financial Report',
             'subtitle' => 'Income, expenses and profit'
         ]);
@@ -186,6 +265,9 @@ class ReportController extends Controller
     {
         $shopId = session('current_shop_id');
         
+        // Get selected customer if provided
+        $selectedCustomer = $request->customer_id ?? null;
+        
         // Get customers with pending dues
         $query = Customer::where('shop_id', $shopId)
             ->where('is_walk_in', false)
@@ -193,10 +275,19 @@ class ReportController extends Controller
                 $q->where('status', '!=', 'paid');
             });
             
+        // Filter by customer if provided
+        if ($selectedCustomer) {
+            $query->where('id', $selectedCustomer);
+        }
+            
         $customers = $query->withCount('sales')
             ->withSum(['sales as total_due' => function ($q) {
                 $q->where('status', '!=', 'paid');
             }], 'due_amount')
+            ->with(['sales as pendingSales' => function($q) {
+                $q->where('status', '!=', 'paid')
+                  ->orderBy('sale_date', 'desc');
+            }])
             ->orderByDesc('total_due')
             ->paginate(15);
             
@@ -205,9 +296,20 @@ class ReportController extends Controller
             ->where('status', '!=', 'paid')
             ->sum('due_amount');
             
+        // Get all customers for filter dropdown
+        $allCustomers = Customer::where('shop_id', $shopId)
+            ->where('is_walk_in', false)
+            ->whereHas('sales', function ($q) {
+                $q->where('status', '!=', 'paid');
+            })
+            ->orderBy('name')
+            ->get();
+            
         return view('reports.customer-dues', [
             'customers' => $customers,
-            'totalDues' => $totalDues,
+            'allCustomers' => $allCustomers,
+            'selectedCustomer' => $selectedCustomer,
+            'totalDueAmount' => $totalDues,
             'title' => 'Customer Dues Report',
             'subtitle' => 'Outstanding payments from customers'
         ]);

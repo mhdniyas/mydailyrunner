@@ -25,10 +25,10 @@
         <div class="min-h-screen flex">
             <!-- Mobile menu overlay -->
             <div id="mobile-menu-overlay" 
-                 class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden transition-opacity duration-300 ease-in-out"></div>
+                 class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden transition-opacity duration-300 ease-in-out touch-none"></div>
             
             <!-- Sidebar -->
-            <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 transform -translate-x-full lg:translate-x-0 w-64 bg-primary-900 shadow-luxury-lg transition-transform duration-300 ease-in-out z-50 lg:z-auto">
+            <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 transform -translate-x-full lg:translate-x-0 w-64 bg-primary-900 shadow-luxury-lg transition-transform duration-300 ease-in-out z-50 lg:z-auto overflow-y-auto overscroll-contain">
                 <div class="flex flex-col h-full">
                     <!-- Logo with close button -->
                     <div class="flex items-center justify-between h-20 bg-primary-800 border-b border-primary-700 px-4">
@@ -74,6 +74,12 @@
                            class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('customer-payments.*') ? 'bg-accent-600 text-white' : '' }}">
                             <i class="fas fa-users mr-3"></i>
                             Customer Payments
+                        </a>
+                        
+                        <a href="{{ route('customers.index') }}" 
+                           class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('customers.*') ? 'bg-accent-600 text-white' : '' }}">
+                            <i class="fas fa-address-card mr-3"></i>
+                            Customers
                         </a>
                         
                         <a href="{{ route('financial-entries.index') }}" 
@@ -125,6 +131,20 @@
                             <i class="fas fa-box mr-3"></i>
                             Products
                         </a>
+
+                        @if(Auth::user()->isAdmin())
+                        <a href="{{ route('admin.subscriptions.index') }}" 
+                           class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('admin.subscriptions.*') ? 'bg-accent-600 text-white' : '' }}">
+                            <i class="fas fa-id-card mr-3"></i>
+                            Subscription Management
+                            @php
+                                $pendingCount = \App\Models\User::where('is_subscribed', true)->where('is_admin_approved', false)->count();
+                            @endphp
+                            @if($pendingCount > 0)
+                                <span class="ml-2 px-2 py-0.5 text-xs rounded-full bg-yellow-500 text-white">{{ $pendingCount }}</span>
+                            @endif
+                        </a>
+                        @endif
 
                         @if(Auth::user()->hasRole('owner'))
                         <a href="{{ route('users.index') }}" 
@@ -221,9 +241,6 @@
                 const sidebarCloseButton = document.getElementById('sidebar-close-button');
                 
                 let isMenuOpen = false;
-                let startX = 0;
-                let currentX = 0;
-                let isDragging = false;
                 
                 function openMobileMenu() {
                     sidebar.classList.remove('-translate-x-full');
@@ -283,33 +300,39 @@
                 });
                 
                 // Touch gesture support
+                let touchStartX = 0;
+                let touchCurrentX = 0;
+                let isDragging = false;
+                
                 sidebar.addEventListener('touchstart', function(e) {
-                    startX = e.touches[0].clientX;
+                    touchStartX = e.touches[0].clientX;
                     isDragging = true;
-                    e.stopPropagation();
                 });
                 
                 sidebar.addEventListener('touchmove', function(e) {
                     if (!isDragging) return;
-                    currentX = e.touches[0].clientX;
-                    const diffX = startX - currentX;
                     
-                    if (diffX > 50 && isMenuOpen) {
+                    touchCurrentX = e.touches[0].clientX;
+                    const diffX = touchStartX - touchCurrentX;
+                    
+                    // Only close if we're swiping left by a significant amount
+                    if (diffX > 70 && isMenuOpen) {
                         closeMobileMenu();
                         isDragging = false;
                     }
-                    e.stopPropagation();
                 });
                 
-                sidebar.addEventListener('touchend', function(e) {
+                sidebar.addEventListener('touchend', function() {
                     isDragging = false;
-                    e.stopPropagation();
                 });
                 
-                // Prevent body scroll when menu is open
-                document.body.addEventListener('touchmove', function(e) {
+                // Prevent scrolling issues when sidebar is open
+                document.addEventListener('touchmove', function(e) {
                     if (isMenuOpen && window.innerWidth < 1024) {
-                        e.preventDefault();
+                        // Only prevent default if touch is on the overlay, not the sidebar content
+                        if (e.target.closest('#sidebar') === null) {
+                            e.preventDefault();
+                        }
                     }
                 }, { passive: false });
             });

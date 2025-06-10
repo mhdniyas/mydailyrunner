@@ -104,6 +104,13 @@ class CustomerPaymentController extends Controller
         DB::beginTransaction();
         
         try {
+            // Verify the shop belongs to the user
+            $shopId = $sale->shop_id;
+            $userShop = auth()->user()->shops()->where('id', $shopId)->first();
+            if (!$userShop) {
+                throw new \Exception('You do not have access to this shop.');
+            }
+            
             // Create payment
             $payment = Payment::create([
                 'sale_id' => $sale->id,
