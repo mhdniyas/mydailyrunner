@@ -22,6 +22,11 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth'])->group(function () {
+    // Debug route for user information
+    Route::get('/debug-user', function () {
+        return view('debug-user');
+    })->name('debug.user');
+    
     // Shop selection routes
     Route::get('/shops/select', [ShopController::class, 'select'])->name('shops.select');
     Route::post('/shops/set', [ShopController::class, 'set'])->name('shops.set');
