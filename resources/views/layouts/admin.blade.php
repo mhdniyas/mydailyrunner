@@ -157,12 +157,14 @@
                 overflow: hidden;
                 transition: max-height 0.3s ease-out, opacity 0.3s ease;
                 opacity: 0;
+                pointer-events: none;
             }
             
             .dropdown-content.show {
                 max-height: 500px;
                 opacity: 1;
                 transition: max-height 0.5s ease-in, opacity 0.3s ease;
+                pointer-events: auto;
             }
             
             .dropdown-chevron {
@@ -176,7 +178,7 @@
             /* Fixed Calculator Popup for Mobile */
             .calc-popup {
                 position: fixed;
-                bottom: 90px; 
+                bottom: 75px; 
                 right: 20px;
                 z-index: 9999999;
                 width: min(90vw, 280px);
@@ -462,41 +464,43 @@
                 
                 <!-- Calculator Widget -->
                 <!-- Direct Calculator Button -->
-                <div id="calc-button" class="fixed bottom-5 right-5 w-14 h-14 rounded-full bg-primary-600 shadow-xl flex items-center justify-center text-white z-[999999] cursor-pointer menu-button-effect ripple hover:bg-primary-700 hover:scale-110 transition-all relative overflow-hidden">
-                    <i class="fas fa-calculator text-xl"></i>
+                <div style="position: fixed !important; bottom: 20px !important; right: 20px !important; width: 60px !important; height: 60px !important; background-color: #3B82F6 !important; color: white !important; border-radius: 50% !important; display: flex !important; justify-content: center !important; align-items: center !important; z-index: 9999999 !important; cursor: pointer !important; box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important; transition: transform 0.2s !important;" id="calc-button" class="ripple">
+                    <i class="fas fa-calculator" style="font-size: 20px !important;"></i>
                 </div>
 
                 <!-- Calculator Popup -->
-                <div id="calc-popup" class="calc-popup">
-                    <div class="mb-3">
-                        <input type="text" id="calc-input" value="0" readonly class="w-full px-4 py-3 text-right text-lg bg-gray-50 border border-gray-200 rounded-lg">
+                <div id="calc-popup" style="display: none; position: fixed !important; bottom: 90px !important; right: 20px !important; z-index: 9999999 !important; background: white !important; border-radius: 10px !important; padding: 15px !important; box-shadow: 0 8px 25px rgba(0,0,0,0.2) !important; width: 280px !important; transform: translateY(10px); opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-weight: bold; color: #333;">Calculator</span>
+                        <button id="calc-close-btn" style="background: none; border: none; color: #777; cursor: pointer; font-size: 16px;">×</button>
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <input type="text" id="calc-input" value="0" readonly style="width: 100% !important; padding: 10px !important; text-align: right !important; font-size: 18px !important; border: 1px solid #ddd !important; border-radius: 5px !important; background: #f9f9f9 !important;">
                     </div>
                     
-                    <div class="grid grid-cols-4 gap-2">
-                        <button onclick="calcClear()" class="calc-btn bg-red-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-red-600 transition-colors relative overflow-hidden">C</button>
-                        <button onclick="calcDelete()" class="calc-btn bg-yellow-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-yellow-600 transition-colors relative overflow-hidden">⌫</button>
-                        <button onclick="calcAppend('/')" class="calc-btn bg-primary-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-700 transition-colors relative overflow-hidden">÷</button>
-                        <button onclick="calcAppend('*')" class="calc-btn bg-primary-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-700 transition-colors relative overflow-hidden">×</button>
+                    <div style="display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 8px !important;">
+                        <button onclick="calcClear()" class="calc-btn" style="background: #EF4444 !important; color: white !important; border: none !important; padding: 12px !important; border-radius: 5px !important; cursor: pointer !important; transition: transform 0.1s !important;">C</button>
+                        <button onclick="calcDelete()" class="calc-btn" style="background: #F59E0B !important; color: white !important; border: none !important; padding: 12px !important; border-radius: 5px !important; cursor: pointer !important; transition: transform 0.1s !important;">⌫</button>
+                        <button onclick="calcAppend('/')" class="calc-btn" style="background: #3B82F6 !important; color: white !important; border: none !important; padding: 12px !important; border-radius: 5px !important; cursor: pointer !important; transition: transform 0.1s !important;">÷</button>
+                        <button onclick="calcAppend('*')" class="calc-btn" style="background: #3B82F6 !important; color: white !important; border: none !important; padding: 12px !important; border-radius: 5px !important; cursor: pointer !important; transition: transform 0.1s !important;">×</button>
                         
-                        <button onclick="calcAppend('7')" class="calc-btn bg-gray-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-700 transition-colors relative overflow-hidden">7</button>
-                        <button onclick="calcAppend('8')" class="calc-btn bg-gray-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-700 transition-colors relative overflow-hidden">8</button>
-                        <button onclick="calcAppend('9')" class="calc-btn bg-gray-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-700 transition-colors relative overflow-hidden">9</button>
-                        <button onclick="calcAppend('-')" class="calc-btn bg-primary-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-700 transition-colors relative overflow-hidden">-</button>
+                        <button onclick="calcAppend('7')" class="calc-btn" style="background: #6B7280 !important; color: white !important; border: none !important; padding: 12px !important; border-radius: 5px !important; cursor: pointer !important; transition: transform 0.1s !important;">7</button>
+                        <button onclick="calcAppend('8')" class="calc-btn" style="background: #6B7280 !important; color: white !important; border: none !important; padding: 12px !important; border-radius: 5px !important; cursor: pointer !important; transition: transform 0.1s !important;">8</button>
+                        <button onclick="calcAppend('9')" class="calc-btn" style="background: #6B7280 !important; color: white !important; border: none !important; padding: 12px !important; border-radius: 5px !important; cursor: pointer !important; transition: transform 0.1s !important;">9</button>
+                        <button onclick="calcAppend('-')" class="calc-btn" style="background: #3B82F6 !important; color: white !important; border: none !important; padding: 12px !important; border-radius: 5px !important; cursor: pointer !important; transition: transform 0.1s !important;">-</button>
                         
-                        <button onclick="calcAppend('4')" class="calc-btn bg-gray-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-700 transition-colors relative overflow-hidden">4</button>
-                        <button onclick="calcAppend('5')" class="calc-btn bg-gray-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-700 transition-colors relative overflow-hidden">5</button>
-                        <button onclick="calcAppend('6')" class="calc-btn bg-gray-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-700 transition-colors relative overflow-hidden">6</button>
-                        <button onclick="calcAppend('+')" class="calc-btn bg-primary-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-700 transition-colors relative overflow-hidden">+</button>
+                        <button onclick="calcAppend('4')" class="calc-btn" style="background: #6B7280 !important; color: white !important; border: none !important; padding: 12px !important; border-radius: 5px !important; cursor: pointer !important; transition: transform 0.1s !important;">4</button>
+                        <button onclick="calcAppend('5')" class="calc-btn" style="background: #6B7280 !important; color: white !important; border: none !important; padding: 12px !important; border-radius: 5px !important; cursor: pointer !important; transition: transform 0.1s !important;">5</button>
+                        <button onclick="calcAppend('6')" class="calc-btn" style="background: #6B7280 !important; color: white !important; border: none !important; padding: 12px !important; border-radius: 5px !important; cursor: pointer !important; transition: transform 0.1s !important;">6</button>
+                        <button onclick="calcAppend('+')" class="calc-btn" style="background: #3B82F6 !important; color: white !important; border: none !important; padding: 12px !important; border-radius: 5px !important; cursor: pointer !important; transition: transform 0.1s !important;">+</button>
                         
-                        <button onclick="calcAppend('1')" class="calc-btn bg-gray-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-700 transition-colors relative overflow-hidden">1</button>
-                        <button onclick="calcAppend('2')" class="calc-btn bg-gray-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-700 transition-colors relative overflow-hidden">2</button>
-                        <button onclick="calcAppend('3')" class="calc-btn bg-gray-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-700 transition-colors relative overflow-hidden">3</button>
-                        <button onclick="calcCalculate()" class="calc-btn bg-green-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors row-span-2 relative overflow-hidden">
-                            =
-                        </button>
+                        <button onclick="calcAppend('1')" class="calc-btn" style="background: #6B7280 !important; color: white !important; border: none !important; padding: 12px !important; border-radius: 5px !important; cursor: pointer !important; transition: transform 0.1s !important;">1</button>
+                        <button onclick="calcAppend('2')" class="calc-btn" style="background: #6B7280 !important; color: white !important; border: none !important; padding: 12px !important; border-radius: 5px !important; cursor: pointer !important; transition: transform 0.1s !important;">2</button>
+                        <button onclick="calcAppend('3')" class="calc-btn" style="background: #6B7280 !important; color: white !important; border: none !important; padding: 12px !important; border-radius: 5px !important; cursor: pointer !important; transition: transform 0.1s !important;">3</button>
+                        <button onclick="calcCalculate()" class="calc-btn" style="background: #10B981 !important; color: white !important; border: none !important; padding: 12px !important; border-radius: 5px !important; cursor: pointer !important; transition: transform 0.1s !important; grid-row: span 2 !important;">=</button>
                         
-                        <button onclick="calcAppend('0')" class="calc-btn bg-gray-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-700 transition-colors col-span-2 relative overflow-hidden">0</button>
-                        <button onclick="calcAppend('.')" class="calc-btn bg-gray-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-700 transition-colors relative overflow-hidden">.</button>
+                        <button onclick="calcAppend('0')" class="calc-btn" style="background: #6B7280 !important; color: white !important; border: none !important; padding: 12px !important; border-radius: 5px !important; cursor: pointer !important; transition: transform 0.1s !important; grid-column: span 2 !important;">0</button>
+                        <button onclick="calcAppend('.')" class="calc-btn" style="background: #6B7280 !important; color: white !important; border: none !important; padding: 12px !important; border-radius: 5px !important; cursor: pointer !important; transition: transform 0.1s !important;">.</button>
                     </div>
                 </div>
             </div>
@@ -504,32 +508,68 @@
         
         <!-- Calculator JavaScript -->
         <script>
+            // Global variables and functions
+            let calcInput;
+            let calcValue = '0';
+            let calcReset = false;
+            let hideCalculator; // Will be defined in the DOMContentLoaded
+            
             // Calculator functionality
             document.addEventListener('DOMContentLoaded', function() {
                 const calcButton = document.getElementById('calc-button');
                 const calcPopup = document.getElementById('calc-popup');
+                const calcCloseBtn = document.getElementById('calc-close-btn');
                 
-                // Move calculator button outside of container to ensure it's always accessible
-                document.body.appendChild(calcButton);
-                document.body.appendChild(calcPopup);
+                calcInput = document.getElementById('calc-input');
                 
-                calcButton.addEventListener('click', function() {
+                // Position the calculator absolutely to prevent it from moving
+                calcButton.style.position = 'fixed';
+                calcButton.style.bottom = '20px';
+                calcButton.style.right = '20px';
+                calcButton.style.zIndex = '9999';
+                
+                // Show calculator when button is clicked
+                calcButton.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent event from bubbling up
                     if (calcPopup.style.display === 'none' || calcPopup.style.display === '') {
-                        // Show calculator with animation
-                        calcPopup.style.display = 'block';
-                        // Trigger reflow
-                        void calcPopup.offsetWidth;
-                        calcPopup.style.opacity = '1';
-                        calcPopup.style.transform = 'translateY(0)';
+                        showCalculator();
                     } else {
-                        // Hide calculator with animation
-                        calcPopup.style.opacity = '0';
-                        calcPopup.style.transform = 'translateY(10px)';
-                        setTimeout(() => {
-                            calcPopup.style.display = 'none';
-                        }, 300);
+                        hideCalculator();
                     }
                 });
+                
+                // Hover effect for calculator button
+                calcButton.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.1)';
+                });
+                
+                calcButton.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+                
+                // Close calculator when close button is clicked
+                calcCloseBtn.addEventListener('click', function() {
+                    hideCalculator();
+                });
+                
+                function showCalculator() {
+                    // Show calculator with animation
+                    calcPopup.style.display = 'block';
+                    // Trigger reflow
+                    void calcPopup.offsetWidth;
+                    calcPopup.style.opacity = '1';
+                    calcPopup.style.transform = 'translateY(0)';
+                }
+                
+                // Define the hideCalculator function
+                hideCalculator = function() {
+                    // Hide calculator with animation
+                    calcPopup.style.opacity = '0';
+                    calcPopup.style.transform = 'translateY(10px)';
+                    setTimeout(() => {
+                        calcPopup.style.display = 'none';
+                    }, 300);
+                };
                 
                 // Button press effect with ripple
                 const calcButtons = document.querySelectorAll('.calc-btn');
@@ -599,63 +639,11 @@
                         ripple.remove();
                     }, 600);
                 }
-                
-                // Dropdown menu functionality
-                const dropdownButtons = document.querySelectorAll('.dropdown-button');
-                
-                // Check URL and auto-expand relevant dropdown 
-                const currentUrl = window.location.href;
-                dropdownButtons.forEach(button => {
-                    const dropdownContent = button.nextElementSibling;
-                    // If this is a dropdown that contains the current active route
-                    if (button.classList.contains('nav-active') || 
-                        dropdownContent.querySelector('a[class*="bg-primary-700"]')) {
-                        toggleDropdown(button, true);
-                    }
-                });
-                
-                dropdownButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        toggleDropdown(button);
-                    });
-                });
-                
-                function toggleDropdown(button, skipAnimation = false) {
-                    const dropdownContent = button.nextElementSibling;
-                    const chevron = button.querySelector('.dropdown-chevron');
-                    
-                    // Toggle current dropdown
-                    if (dropdownContent.classList.contains('show')) {
-                        dropdownContent.classList.remove('show');
-                        chevron.classList.remove('rotate');
-                    } else {
-                        dropdownContent.classList.add('show');
-                        chevron.classList.add('rotate');
-                        
-                        // If opening without animation (initial page load), don't close other dropdowns
-                        if (skipAnimation) {
-                            return;
-                        }
-                        
-                        // Close other dropdowns
-                        dropdownButtons.forEach(otherButton => {
-                            if (otherButton !== button) {
-                                const otherContent = otherButton.nextElementSibling;
-                                const otherChevron = otherButton.querySelector('.dropdown-chevron');
-                                otherContent.classList.remove('show');
-                                otherChevron.classList.remove('rotate');
-                            }
-                        });
-                    }
-                }
             });
 
-            let calcInput = document.getElementById('calc-input');
-            let calcValue = '0';
-            let calcReset = false;
-
+            // Calculator functions
             function updateCalcDisplay() {
-                calcInput.value = calcValue;
+                document.getElementById('calc-input').value = calcValue;
             }
 
             function calcAppend(val) {
@@ -711,13 +699,12 @@
                 const popup = document.getElementById('calc-popup');
                 const button = document.getElementById('calc-button');
                 
-                if (popup.style.display !== 'none' && !popup.contains(event.target) && event.target !== button && !button.contains(event.target)) {
-                    // Hide with animation
-                    popup.style.opacity = '0';
-                    popup.style.transform = 'translateY(10px)';
-                    setTimeout(() => {
-                        popup.style.display = 'none';
-                    }, 300);
+                if (popup.style.display !== 'none' && 
+                    !popup.contains(event.target) && 
+                    event.target !== button && 
+                    !button.contains(event.target)) {
+                    // Call the hide calculator function
+                    hideCalculator();
                 }
             });
             
@@ -734,7 +721,9 @@
                 else if (key === '*') calcAppend('*');
                 else if (key === '/') calcAppend('/');
                 else if (key === 'Enter') calcCalculate();
-                else if (key === 'Escape') calcClear();
+                else if (key === 'Escape') {
+                    hideCalculator();
+                }
                 else if (key === 'Backspace') calcDelete();
             });
         </script>
@@ -742,6 +731,44 @@
         <!-- Mobile Navigation JavaScript -->
         <script>
             document.addEventListener('DOMContentLoaded', function() {
+                // Initialize dropdown functionality
+                const dropdownButtons = document.querySelectorAll('.dropdown-button');
+                
+                dropdownButtons.forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault(); // Prevent default behavior
+                        e.stopPropagation(); // Prevent event bubbling
+                        
+                        // Get the dropdown content
+                        const content = this.nextElementSibling;
+                        const chevron = this.querySelector('.dropdown-chevron');
+                        
+                        // Toggle show class
+                        content.classList.toggle('show');
+                        chevron.classList.toggle('rotate');
+                        
+                        // Close other dropdowns
+                        dropdownButtons.forEach(otherButton => {
+                            if (otherButton !== button) {
+                                const otherContent = otherButton.nextElementSibling;
+                                const otherChevron = otherButton.querySelector('.dropdown-chevron');
+                                otherContent.classList.remove('show');
+                                otherChevron.classList.remove('rotate');
+                            }
+                        });
+                    });
+                });
+                
+                // Check for active dropdowns and expand them on page load
+                dropdownButtons.forEach(button => {
+                    if (button.classList.contains('nav-active') || button.querySelector('.nav-active')) {
+                        const content = button.nextElementSibling;
+                        const chevron = button.querySelector('.dropdown-chevron');
+                        content.classList.add('show');
+                        chevron.classList.add('rotate');
+                    }
+                });
+                
                 const mobileMenuButton = document.getElementById('mobile-menu-button');
                 const sidebar = document.getElementById('sidebar');
                 const overlay = document.getElementById('mobile-menu-overlay');

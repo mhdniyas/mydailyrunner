@@ -10,8 +10,9 @@ echo "☁️ Starting cloud development..."
 # Example: docker-compose up -d
 
 echo "💻 Starting local development..."
-# Add your local start command here (e.g., npm start, yarn dev, etc.)
-# Example: npm run dev
+# Run npm build to compile assets
+echo "🔨 Building assets..."
+npm run build
 
 echo "✅ Development environment ready!"
 echo "You can now work on both cloud and local environments"

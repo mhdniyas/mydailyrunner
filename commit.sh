@@ -9,6 +9,9 @@ php artisan config:clear
 php artisan route:clear
 php artisan view:clear
 
+echo "🔨 Building assets..."
+npm run build
+
 echo "⚡ Optimizing Laravel..."
 php artisan optimize
 
