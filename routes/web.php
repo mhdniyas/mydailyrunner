@@ -15,6 +15,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\DiscrepancyCalculatorController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -105,6 +106,13 @@ Route::middleware(['auth'])->group(function () {
         
         // Financial Entry routes
         Route::resource('financial-entries', FinancialEntryController::class);
+        
+        // Financial Category routes
+        Route::post('/financial-categories', [App\Http\Controllers\FinancialCategoryController::class, 'store'])->name('financial-categories.store');
+        
+        // Discrepancy Calculator routes
+        Route::get('/discrepancy-calculator', [App\Http\Controllers\DiscrepancyCalculatorController::class, 'index'])->name('discrepancy-calculator.index');
+        Route::post('/discrepancy-calculator/calculate', [App\Http\Controllers\DiscrepancyCalculatorController::class, 'calculate'])->name('discrepancy-calculator.calculate');
         
         // Reports routes
         Route::prefix('reports')->name('reports.')->group(function () {

@@ -33,7 +33,7 @@ class FinancialEntryController extends Controller
             $query->whereBetween('entry_date', [$request->from_date, $request->to_date]);
         }
         
-        $entries = $query->with('category')
+        $entries = $query->with(['category', 'user'])
             ->orderBy('entry_date', 'desc')
             ->paginate(15);
             

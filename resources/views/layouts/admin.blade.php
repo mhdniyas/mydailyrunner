@@ -123,6 +123,16 @@
                         </a>
                         
                         <div class="px-4 py-3">
+                            <h5 class="text-xs uppercase font-semibold text-primary-400 tracking-wider">Tools</h5>
+                        </div>
+                        
+                        <a href="{{ route('discrepancy-calculator.index') }}" 
+                           class="flex items-center px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('discrepancy-calculator.*') ? 'bg-accent-600 text-white' : '' }}">
+                            <i class="fas fa-calculator mr-3"></i>
+                            Discrepancy Calculator
+                        </a>
+                        
+                        <div class="px-4 py-3">
                             <h5 class="text-xs uppercase font-semibold text-primary-400 tracking-wider">Setup</h5>
                         </div>
                         
