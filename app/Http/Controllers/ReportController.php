@@ -284,10 +284,7 @@ class ReportController extends Controller
             ->withSum(['sales as total_due' => function ($q) {
                 $q->where('status', '!=', 'paid');
             }], 'due_amount')
-            ->with(['sales as pendingSales' => function($q) {
-                $q->where('status', '!=', 'paid')
-                  ->orderBy('sale_date', 'desc');
-            }])
+            ->with('pendingSales')
             ->orderByDesc('total_due')
             ->paginate(15);
             

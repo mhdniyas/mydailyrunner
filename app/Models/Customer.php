@@ -54,6 +54,16 @@ class Customer extends Model
     }
 
     /**
+     * Get the pending sales for the customer (sales that are not fully paid).
+     */
+    public function pendingSales(): HasMany
+    {
+        return $this->hasMany(Sale::class)
+            ->where('status', '!=', 'paid')
+            ->orderBy('sale_date', 'desc');
+    }
+
+    /**
      * Get the user who created the customer.
      */
     public function user(): BelongsTo

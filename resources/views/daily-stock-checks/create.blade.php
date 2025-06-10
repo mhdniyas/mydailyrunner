@@ -121,8 +121,8 @@
             </div>
             <div class="bg-yellow-50 p-4 rounded-md">
                 <p class="text-yellow-800">
-                    <i class="fas fa-exclamation-triangle mr-2"></i>
-                    After submission, the product's current stock will be updated to match the physical stock count.
+                    <i class="fas fa-info-circle mr-2"></i>
+                    The daily stock check records discrepancies for reporting purposes only. System stock is only affected by sales and stock-ins.
                 </p>
             </div>
         </div>

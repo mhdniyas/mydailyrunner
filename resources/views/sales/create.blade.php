@@ -36,7 +36,7 @@
                 
                 <div id="sale-items">
                     <div class="sale-item bg-gray-50 p-4 rounded-md mb-4">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Product</label>
                                 <select name="product_id[]" class="product-select mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500" required>
@@ -49,11 +49,20 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Quantity</label>
+                                <label class="block text-sm font-medium text-gray-700">Customer Current Balance</label>
+                                <div class="flex items-center">
+                                    <input type="number" class="current-qty-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500" step="0.01" min="0" placeholder="Optional">
+                                    <span class="unit-display-current ml-2 text-gray-500"></span>
+                                </div>
+                                <small class="text-gray-500 text-xs">Customer's current product balance</small>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Sale Quantity</label>
                                 <div class="flex items-center">
                                     <input type="number" name="quantity[]" class="quantity-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500" step="0.01" min="0.01" required>
                                     <span class="unit-display ml-2 text-gray-500"></span>
                                 </div>
+                                <small class="text-gray-500 text-xs">Quantity to sell to customer</small>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Price</label>
@@ -145,6 +154,7 @@
                 });
                 newItem.querySelector('select').selectedIndex = 0;
                 newItem.querySelector('.unit-display').textContent = '';
+                newItem.querySelector('.unit-display-current').textContent = '';
                 
                 // Show remove button
                 newItem.querySelector('.remove-item').style.display = 'block';
@@ -156,10 +166,12 @@
             // Initialize sale item events
             function initializeSaleItem(item) {
                 const productSelect = item.querySelector('.product-select');
+                const currentQtyInput = item.querySelector('.current-qty-input');
                 const quantityInput = item.querySelector('.quantity-input');
                 const priceInput = item.querySelector('.price-input');
                 const subtotalDisplay = item.querySelector('.subtotal-display');
                 const unitDisplay = item.querySelector('.unit-display');
+                const unitDisplayCurrent = item.querySelector('.unit-display-current');
                 const removeBtn = item.querySelector('.remove-item');
                 
                 // Product selection change
@@ -167,12 +179,36 @@
                     const selectedOption = this.options[this.selectedIndex];
                     const price = selectedOption.dataset.price || 0;
                     const unit = selectedOption.dataset.unit || '';
+                    const availableStock = parseFloat(selectedOption.dataset.stock) || 0;
                     
                     priceInput.value = price;
                     unitDisplay.textContent = unit;
+                    unitDisplayCurrent.textContent = unit;
                     
+                    // Auto-calculate quantity if current qty is entered
+                    calculateSaleQuantity();
                     updateSubtotal();
                 });
+                
+                // Current quantity change - auto-calculate sale quantity
+                currentQtyInput.addEventListener('input', function() {
+                    calculateSaleQuantity();
+                });
+                
+                // Calculate sale quantity based on available stock - current quantity
+                function calculateSaleQuantity() {
+                    const selectedOption = productSelect.options[productSelect.selectedIndex];
+                    if (!selectedOption || !selectedOption.value) return;
+                    
+                    const availableStock = parseFloat(selectedOption.dataset.stock) || 0;
+                    const currentQty = parseFloat(currentQtyInput.value) || 0;
+                    
+                    if (currentQty > 0) {
+                        const saleQty = Math.max(0, availableStock - currentQty);
+                        quantityInput.value = saleQty.toFixed(2);
+                        updateSubtotal();
+                    }
+                }
                 
                 // Quantity or price change
                 quantityInput.addEventListener('input', updateSubtotal);

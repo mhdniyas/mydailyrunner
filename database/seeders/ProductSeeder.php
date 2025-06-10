@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Product;
-use App\Models\Shop;
 use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
@@ -13,56 +12,68 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
-        $shops = Shop::all();
-
         $products = [
             [
-                'name' => 'Premium Cricket Ball',
-                'description' => 'High quality cricket ball',
-                'unit' => 'pcs',
-                'min_stock_level' => 10.00,
-                'current_stock' => 50.00,
-                'avg_cost' => 150.00,
-                'sale_price' => 200.00,
-                'user_id' => 1,
+                'name' => 'Boiled Rice',
+                'unit' => 'kg',
+                'sale_price' => 50.00,
+                'current_stock' => 0,
+                'min_stock_level' => 200,
+                'description' => 'Premium quality boiled rice (BR)',
             ],
             [
-                'name' => 'Cricket Bat',
-                'description' => 'Professional cricket bat',
-                'unit' => 'pcs',
-                'min_stock_level' => 5.00,
-                'current_stock' => 25.00,
-                'avg_cost' => 1000.00,
-                'sale_price' => 1500.00,
-                'user_id' => 1,
+                'name' => 'Raw Rice',
+                'unit' => 'kg',
+                'sale_price' => 45.00,
+                'current_stock' => 0,
+                'min_stock_level' => 200,
+                'description' => 'Fresh raw rice (RR)',
             ],
             [
-                'name' => 'Cricket Gloves',
-                'description' => 'Protective cricket gloves',
-                'unit' => 'pcs',
-                'min_stock_level' => 8.00,
-                'current_stock' => 30.00,
-                'avg_cost' => 250.00,
-                'sale_price' => 350.00,
-                'user_id' => 1,
+                'name' => 'Custom Milled Rice',
+                'unit' => 'kg',
+                'sale_price' => 55.00,
+                'current_stock' => 0,
+                'min_stock_level' => 200,
+                'description' => 'Specially milled rice (CMR)',
             ],
             [
-                'name' => 'Cricket Helmet',
-                'description' => 'Safety cricket helmet',
-                'unit' => 'pcs',
-                'min_stock_level' => 3.00,
-                'current_stock' => 15.00,
-                'avg_cost' => 800.00,
-                'sale_price' => 1200.00,
-                'user_id' => 1,
+                'name' => 'Wheat',
+                'unit' => 'kg',
+                'sale_price' => 40.00,
+                'current_stock' => 0,
+                'min_stock_level' => 200,
+                'description' => 'High quality wheat',
+            ],
+            [
+                'name' => 'Atta',
+                'unit' => 'kg',
+                'sale_price' => 42.00,
+                'current_stock' => 0,
+                'min_stock_level' => 200,
+                'description' => 'Wheat flour (Atta)',
+            ],
+            [
+                'name' => 'Sugar',
+                'unit' => 'kg',
+                'sale_price' => 52.00,
+                'current_stock' => 0,
+                'min_stock_level' => 200,
+                'description' => 'Pure white sugar',
             ],
         ];
 
-        foreach ($shops as $shop) {
-            foreach ($products as $product) {
-                $product['shop_id'] = $shop->id;
-                Product::create($product);
-            }
+        foreach ($products as $productData) {
+            Product::create([
+                'shop_id' => 1,
+                'user_id' => 1,
+                'name' => $productData['name'],
+                'unit' => $productData['unit'],
+                'sale_price' => $productData['sale_price'],
+                'current_stock' => $productData['current_stock'],
+                'min_stock_level' => $productData['min_stock_level'],
+                'description' => $productData['description'],
+            ]);
         }
     }
 }

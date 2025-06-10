@@ -187,10 +187,8 @@ class DailyStockCheckController extends Controller
                 'user_id' => Auth::id(),
             ]);
             
-            // Update product's current stock to match physical count
-            $product = Product::find($productId);
-            $product->current_stock = $physicalStock;
-            $product->save();
+            // Note: System stock is not updated here - it should only be affected by sales and stock-ins
+            // The daily stock check records the discrepancy for reporting purposes only
         }
         
         return redirect()->route('daily-stock-checks.index')
