@@ -153,7 +153,7 @@ class DailyStockCheckController extends Controller
         }
         
         // Verify the shop belongs to the user
-        $userShop = auth()->user()->shops()->where('id', $shopId)->first();
+        $userShop = auth()->user()->shops()->where('shops.id', $shopId)->first();
         if (!$userShop) {
             return redirect()->route('daily-stock-checks.index')
                 ->with('error', 'You do not have access to this shop.');

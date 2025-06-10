@@ -326,7 +326,7 @@ class ReportController extends Controller
         $products = Product::where('shop_id', $shopId)
             ->whereNotNull('avg_bag_weight')
             ->orderBy('name')
-            ->get();
+            ->paginate(15);
             
         // Get recent stock ins with bag weights
         $stockIns = StockIn::where('shop_id', $shopId)

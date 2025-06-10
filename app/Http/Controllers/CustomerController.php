@@ -78,7 +78,7 @@ class CustomerController extends Controller
         $validated['user_id'] = auth()->id();
         
         // Verify the shop belongs to the user
-        $userShop = auth()->user()->shops()->where('id', $shopId)->first();
+        $userShop = auth()->user()->shops()->where('shops.id', $shopId)->first();
         if (!$userShop) {
             abort(403, 'You do not have access to this shop.');
         }

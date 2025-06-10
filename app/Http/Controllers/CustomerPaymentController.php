@@ -106,7 +106,7 @@ class CustomerPaymentController extends Controller
         try {
             // Verify the shop belongs to the user
             $shopId = $sale->shop_id;
-            $userShop = auth()->user()->shops()->where('id', $shopId)->first();
+            $userShop = auth()->user()->shops()->where('shops.id', $shopId)->first();
             if (!$userShop) {
                 throw new \Exception('You do not have access to this shop.');
             }

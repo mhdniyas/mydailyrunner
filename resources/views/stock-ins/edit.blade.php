@@ -3,7 +3,7 @@
     <x-slot name="subtitle">Modify stock information</x-slot>
 
     <div class="bg-white rounded-lg shadow-md p-6">
-        <form action="{{ route('stock-ins.update', $stockIn) }}" method="POST">
+        <form action="{{ route('stock-ins.update', $stockIn) }}" method="POST" id="stockInEditForm">
             @csrf
             @method('PUT')
 
@@ -50,6 +50,83 @@
                     @enderror
                 </div>
 
+                <!-- Bag Weight Calculation Section -->
+                <div class="md:col-span-2">
+                    <div class="bg-gray-50 p-4 rounded-md">
+                        <h4 class="text-md font-semibold text-gray-900 mb-4">Bag Weight Calculation</h4>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <!-- Formula Options -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Calculation Method</label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="radio" name="calculation_method" value="formula_minus_half" 
+                                               class="text-primary-600 focus:ring-primary-500" 
+                                               {{ old('calculation_method', $stockIn->calculation_method ?? 'formula_minus_half') == 'formula_minus_half' ? 'checked' : '' }}>
+                                        <span class="ml-2 text-sm">(Quantity ÷ Bags) - 0.5</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="calculation_method" value="formula_direct" 
+                                               class="text-primary-600 focus:ring-primary-500"
+                                               {{ old('calculation_method', $stockIn->calculation_method) == 'formula_direct' ? 'checked' : '' }}>
+                                        <span class="ml-2 text-sm">Quantity ÷ Bags</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="calculation_method" value="manual" 
+                                               class="text-primary-600 focus:ring-primary-500"
+                                               {{ old('calculation_method', $stockIn->calculation_method) == 'manual' ? 'checked' : '' }}>
+                                        <span class="ml-2 text-sm">Manual Override</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Calculate Button and Results -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Calculate Values</label>
+                                <button type="button" id="calculateBtn" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-calculator mr-2"></i>Calculate
+                                </button>
+                                
+                                <!-- Calculation Results -->
+                                <div id="calculationResults" class="mt-3 space-y-2 hidden">
+                                    <div class="text-xs bg-white p-2 rounded border">
+                                        <div class="font-medium text-gray-700">Formula 1: <span id="result1">-</span></div>
+                                        <div class="text-gray-500">(Quantity ÷ Bags) - 0.5</div>
+                                    </div>
+                                    <div class="text-xs bg-white p-2 rounded border">
+                                        <div class="font-medium text-gray-700">Formula 2: <span id="result2">-</span></div>
+                                        <div class="text-gray-500">Quantity ÷ Bags</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Manual Override Input -->
+                            <div id="manualOverrideDiv" class="hidden">
+                                <label for="manual_bag_weight" class="block text-sm font-medium text-gray-700">Manual Bag Weight</label>
+                                <input type="number" name="manual_bag_weight" id="manual_bag_weight" 
+                                       value="{{ old('manual_bag_weight', $stockIn->manual_bag_weight) }}" 
+                                       step="0.01" min="0" 
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500">
+                                @error('manual_bag_weight')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Final Bag Weight Display -->
+                        <div class="bg-primary-50 p-3 rounded-md">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-primary-700">Final Bag Weight:</span>
+                                <span id="finalBagWeight" class="text-lg font-semibold text-primary-900">{{ number_format($stockIn->getActualBagWeight(), 2) }}</span>
+                            </div>
+                            <div class="mt-1 text-xs text-primary-600">
+                                Current method: {{ $stockIn->getCalculationMethodDisplay() }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="md:col-span-2">
                     <label for="notes" class="block text-sm font-medium text-gray-700">Notes</label>
                     <textarea name="notes" id="notes" rows="3" 
@@ -80,4 +157,90 @@
             </p>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const quantityInput = document.getElementById('quantity');
+            const bagsInput = document.getElementById('bags');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const calculationResults = document.getElementById('calculationResults');
+            const result1 = document.getElementById('result1');
+            const result2 = document.getElementById('result2');
+            const finalBagWeight = document.getElementById('finalBagWeight');
+            const manualBagWeight = document.getElementById('manual_bag_weight');
+            const manualOverrideDiv = document.getElementById('manualOverrideDiv');
+            const calculationMethodInputs = document.querySelectorAll('input[name="calculation_method"]');
+
+            // Show/hide manual override input
+            function toggleManualOverride() {
+                const selectedMethod = document.querySelector('input[name="calculation_method"]:checked').value;
+                if (selectedMethod === 'manual') {
+                    manualOverrideDiv.classList.remove('hidden');
+                } else {
+                    manualOverrideDiv.classList.add('hidden');
+                }
+                updateFinalBagWeight();
+            }
+
+            // Calculate values
+            function calculateValues() {
+                const quantity = parseFloat(quantityInput.value) || 0;
+                const bags = parseInt(bagsInput.value) || 1;
+
+                if (quantity > 0 && bags > 0) {
+                    const formula1Result = (quantity / bags) - 0.5;
+                    const formula2Result = quantity / bags;
+
+                    result1.textContent = formula1Result.toFixed(2);
+                    result2.textContent = formula2Result.toFixed(2);
+                    
+                    calculationResults.classList.remove('hidden');
+                } else {
+                    result1.textContent = '-';
+                    result2.textContent = '-';
+                    calculationResults.classList.add('hidden');
+                }
+                
+                updateFinalBagWeight();
+            }
+
+            // Update final bag weight display
+            function updateFinalBagWeight() {
+                const selectedMethod = document.querySelector('input[name="calculation_method"]:checked').value;
+                const quantity = parseFloat(quantityInput.value) || 0;
+                const bags = parseInt(bagsInput.value) || 1;
+                let finalWeight = 0;
+
+                if (quantity > 0 && bags > 0) {
+                    switch(selectedMethod) {
+                        case 'formula_minus_half':
+                            finalWeight = (quantity / bags) - 0.5;
+                            break;
+                        case 'formula_direct':
+                            finalWeight = quantity / bags;
+                            break;
+                        case 'manual':
+                            finalWeight = parseFloat(manualBagWeight.value) || 0;
+                            break;
+                    }
+                }
+
+                finalBagWeight.textContent = finalWeight > 0 ? finalWeight.toFixed(2) : '-';
+            }
+
+            // Event listeners
+            calculateBtn.addEventListener('click', calculateValues);
+            
+            calculationMethodInputs.forEach(input => {
+                input.addEventListener('change', toggleManualOverride);
+            });
+
+            manualBagWeight.addEventListener('input', updateFinalBagWeight);
+            quantityInput.addEventListener('input', updateFinalBagWeight);
+            bagsInput.addEventListener('input', updateFinalBagWeight);
+
+            // Initial setup
+            toggleManualOverride();
+        });
+    </script>
 </x-app-layout>

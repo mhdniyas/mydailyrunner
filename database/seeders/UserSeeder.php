@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Shop;
+use App\Models\ShopUser;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -13,44 +15,73 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create superadmin
-        User::create([
-            'name' => 'Super Admin',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('password'),
-            'superadmin' => true,
+        // Create admin user
+        $adminUser = User::create([
+            'name' => 'System Admin',
+            'email' => 'admin@mydailyrunner.com',
+            'password' => Hash::make('password123'),
         ]);
 
-        // Create regular users
+        // Create or get the first shop
+        $shop = Shop::first();
+        if (!$shop) {
+            $shop = Shop::create([
+                'name' => 'Main Shop',
+                'address' => '123 Main Street',
+                'phone' => '+1234567890',
+                'email' => 'shop@mydailyrunner.com',
+                'owner_id' => $adminUser->id,
+            ]);
+        }
+
+        // Assign admin role to the user
+        ShopUser::create([
+            'user_id' => $adminUser->id,
+            'shop_id' => $shop->id,
+            'role' => 'admin',
+        ]);
+
+        // Create other sample users
         $users = [
             [
                 'name' => 'Shop Owner',
-                'email' => 'owner@example.com',
-                'password' => Hash::make('password'),
-                'superadmin' => false,
+                'email' => 'owner@mydailyrunner.com',
+                'password' => Hash::make('password123'),
             ],
             [
                 'name' => 'Shop Manager',
-                'email' => 'manager@example.com',
-                'password' => Hash::make('password'),
-                'superadmin' => false,
+                'email' => 'manager@mydailyrunner.com',
+                'password' => Hash::make('password123'),
             ],
             [
-                'name' => 'Stock Checker',
-                'email' => 'stock@example.com',
-                'password' => Hash::make('password'),
-                'superadmin' => false,
+                'name' => 'Stock User',
+                'email' => 'stock@mydailyrunner.com',
+                'password' => Hash::make('password123'),
             ],
             [
                 'name' => 'Finance User',
-                'email' => 'finance@example.com',
-                'password' => Hash::make('password'),
-                'superadmin' => false,
+                'email' => 'finance@mydailyrunner.com',
+                'password' => Hash::make('password123'),
             ],
         ];
 
-        foreach ($users as $user) {
-            User::create($user);
+        foreach ($users as $userData) {
+            $user = User::create($userData);
+            
+            // Assign appropriate roles to sample users
+            $role = match($userData['email']) {
+                'owner@mydailyrunner.com' => 'owner',
+                'manager@mydailyrunner.com' => 'manager',
+                'stock@mydailyrunner.com' => 'stock',
+                'finance@mydailyrunner.com' => 'finance',
+                default => 'viewer'
+            };
+
+            ShopUser::create([
+                'user_id' => $user->id,
+                'shop_id' => $shop->id,
+                'role' => $role,
+            ]);
         }
     }
 }

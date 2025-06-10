@@ -55,11 +55,18 @@ class StockInController extends Controller
             'quantity' => 'required|numeric|min:0.1',
             'bags' => 'required|integer|min:1',
             'cost' => 'required|numeric|min:0',
+            'calculation_method' => 'required|in:formula_minus_half,formula_direct,manual',
+            'manual_bag_weight' => 'nullable|numeric|min:0|required_if:calculation_method,manual',
             'notes' => 'nullable|string|max:255',
         ]);
         
-        // Calculate average bag weight
-        $avgBagWeight = ($validated['quantity'] / $validated['bags']) - 0.5;
+        // Calculate average bag weight based on method
+        $avgBagWeight = match($validated['calculation_method']) {
+            'manual' => $validated['manual_bag_weight'],
+            'formula_direct' => $validated['quantity'] / $validated['bags'],
+            'formula_minus_half' => ($validated['quantity'] / $validated['bags']) - 0.5,
+            default => ($validated['quantity'] / $validated['bags']) - 0.5
+        };
         
         // Create stock in record
         $stockIn = StockIn::create([
@@ -69,6 +76,8 @@ class StockInController extends Controller
             'bags' => $validated['bags'],
             'cost' => $validated['cost'],
             'avg_bag_weight' => $avgBagWeight,
+            'calculation_method' => $validated['calculation_method'],
+            'manual_bag_weight' => $validated['manual_bag_weight'] ?? null,
             'notes' => $validated['notes'] ?? null,
             'user_id' => Auth::id(),
         ]);
@@ -153,11 +162,18 @@ class StockInController extends Controller
             'quantity' => 'required|numeric|min:0.1',
             'bags' => 'required|integer|min:1',
             'cost' => 'required|numeric|min:0',
+            'calculation_method' => 'required|in:formula_minus_half,formula_direct,manual',
+            'manual_bag_weight' => 'nullable|numeric|min:0|required_if:calculation_method,manual',
             'notes' => 'nullable|string|max:255',
         ]);
         
-        // Calculate average bag weight
-        $avgBagWeight = ($validated['quantity'] / $validated['bags']) - 0.5;
+        // Calculate average bag weight based on method
+        $avgBagWeight = match($validated['calculation_method']) {
+            'manual' => $validated['manual_bag_weight'],
+            'formula_direct' => $validated['quantity'] / $validated['bags'],
+            'formula_minus_half' => ($validated['quantity'] / $validated['bags']) - 0.5,
+            default => ($validated['quantity'] / $validated['bags']) - 0.5
+        };
         
         // Get the old values for product updates
         $oldProductId = $stockIn->product_id;
@@ -172,6 +188,8 @@ class StockInController extends Controller
             'bags' => $validated['bags'],
             'cost' => $validated['cost'],
             'avg_bag_weight' => $avgBagWeight,
+            'calculation_method' => $validated['calculation_method'],
+            'manual_bag_weight' => $validated['manual_bag_weight'] ?? null,
             'notes' => $validated['notes'] ?? null,
         ]);
         

@@ -21,6 +21,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bags</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bag Weight</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
@@ -45,7 +46,17 @@
                                     {{ number_format($stockIn->cost, 2) }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    {{ number_format($stockIn->avg_bag_weight, 2) }} {{ $stockIn->product->unit }}
+                                    {{ number_format($stockIn->getActualBagWeight(), 2) }} {{ $stockIn->product->unit }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        @if(($stockIn->calculation_method ?? 'formula_minus_half') === 'manual') bg-yellow-100 text-yellow-800
+                                        @elseif(($stockIn->calculation_method ?? 'formula_minus_half') === 'formula_direct') bg-blue-100 text-blue-800
+                                        @else bg-green-100 text-green-800 @endif">
+                                        @if(($stockIn->calculation_method ?? 'formula_minus_half') === 'manual') Manual
+                                        @elseif(($stockIn->calculation_method ?? 'formula_minus_half') === 'formula_direct') Direct
+                                        @else Formula @endif
+                                    </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <a href="{{ route('stock-ins.show', $stockIn) }}" class="text-primary-600 hover:text-primary-900 mr-3">

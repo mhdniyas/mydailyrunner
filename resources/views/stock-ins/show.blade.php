@@ -47,7 +47,14 @@
             </div>
             <div>
                 <p class="text-sm text-gray-500">Average Bag Weight</p>
-                <p class="font-medium">{{ number_format($stockIn->avg_bag_weight, 2) }} {{ $stockIn->product->unit }}</p>
+                <p class="font-medium">{{ number_format($stockIn->getActualBagWeight(), 2) }} {{ $stockIn->product->unit }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Calculation Method</p>
+                <p class="font-medium">{{ $stockIn->getCalculationMethodDisplay() }}</p>
+                @if(($stockIn->calculation_method ?? 'formula_minus_half') === 'manual')
+                    <p class="text-xs text-gray-400">Manual value: {{ number_format($stockIn->manual_bag_weight, 2) }} {{ $stockIn->product->unit }}</p>
+                @endif
             </div>
             <div>
                 <p class="text-sm text-gray-500">Recorded By</p>

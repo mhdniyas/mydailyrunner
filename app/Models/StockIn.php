@@ -21,6 +21,8 @@ class StockIn extends Model
         'bags',
         'cost',
         'avg_bag_weight',
+        'calculation_method',
+        'manual_bag_weight',
         'notes',
         'user_id',
     ];
@@ -55,5 +57,31 @@ class StockIn extends Model
     public function getTotalCost()
     {
         return $this->cost;
+    }
+
+    /**
+     * Get the actual bag weight based on calculation method.
+     */
+    public function getActualBagWeight()
+    {
+        return match($this->calculation_method) {
+            'manual' => $this->manual_bag_weight,
+            'formula_direct' => $this->quantity / $this->bags,
+            'formula_minus_half' => ($this->quantity / $this->bags) - 0.5,
+            default => $this->avg_bag_weight
+        };
+    }
+
+    /**
+     * Get the calculation method display name.
+     */
+    public function getCalculationMethodDisplay()
+    {
+        return match($this->calculation_method) {
+            'manual' => 'Manual Override',
+            'formula_direct' => 'Quantity ÷ Bags',
+            'formula_minus_half' => '(Quantity ÷ Bags) - 0.5',
+            default => 'Unknown'
+        };
     }
 }

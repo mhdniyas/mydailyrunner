@@ -27,6 +27,21 @@ Route::middleware(['auth'])->group(function () {
         return view('debug-user');
     })->name('debug.user');
     
+    // Debug route to check session data
+    Route::get('/debug-session', function () {
+        return response()->json([
+            'current_shop_id' => session('current_shop_id'),
+            'current_shop_name' => session('current_shop_name'),
+            'current_shop_role' => session('current_shop_role'),
+            'user_id' => auth()->id(),
+            'user_name' => auth()->user()->name ?? 'Not logged in',
+            'user_shops' => auth()->user()->shops ?? 'No shops',
+            'products_count' => \App\Models\Product::count(),
+            'customers_count' => \App\Models\Customer::count(),
+            'sales_count' => \App\Models\Sale::count(),
+        ]);
+    })->middleware('auth');
+    
     // Shop selection routes
     Route::get('/shops/select', [ShopController::class, 'select'])->name('shops.select');
     Route::post('/shops/set', [ShopController::class, 'set'])->name('shops.set');

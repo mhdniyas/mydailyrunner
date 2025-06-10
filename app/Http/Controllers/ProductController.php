@@ -65,7 +65,6 @@ class ProductController extends Controller
         // Create product
         $product = Product::create([
             'shop_id' => $shopId,
-            'user_id' => auth()->id(),
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
             'unit' => $validated['unit'],

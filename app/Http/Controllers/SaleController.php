@@ -51,6 +51,13 @@ class SaleController extends Controller
     public function create()
     {
         $shopId = session('current_shop_id');
+        
+        // Check if shop is selected
+        if (!$shopId) {
+            return redirect()->route('shops.select')
+                ->with('error', 'Please select a shop first.');
+        }
+        
         $products = Product::where('shop_id', $shopId)
             ->where('current_stock', '>', 0)
             ->orderBy('name')
@@ -84,21 +91,44 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
+        \Log::info('Sales store method called', [
+            'request_data' => $request->all(),
+            'session_shop_id' => session('current_shop_id'),
+            'user_id' => auth()->id()
+        ]);
+        
         $shopId = session('current_shop_id');
         
-        $validated = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'sale_date' => 'required|date',
-            'product_id' => 'required|array',
-            'product_id.*' => 'required|exists:products,id',
-            'quantity' => 'required|array',
-            'quantity.*' => 'required|numeric|min:0.1',
-            'price' => 'required|array',
-            'price.*' => 'required|numeric|min:0',
-            'total_amount' => 'required|numeric|min:0',
-            'paid_amount' => 'required|numeric|min:0',
-            'notes' => 'nullable|string|max:255',
-        ]);
+        // Check if shop is selected
+        if (!$shopId) {
+            \Log::warning('No shop selected in session');
+            return redirect()->route('shops.select')
+                ->with('error', 'Please select a shop first.');
+        }
+        
+        try {
+            \Log::info('Starting validation...');
+            $validated = $request->validate([
+                'customer_id' => 'required|exists:customers,id',
+                'sale_date' => 'required|date',
+                'product_id' => 'required|array',
+                'product_id.*' => 'required|exists:products,id',
+                'quantity' => 'required|array',
+                'quantity.*' => 'required|numeric|min:0.1',
+                'price' => 'required|array',
+                'price.*' => 'required|numeric|min:0',
+                'total_amount' => 'required|numeric|min:0',
+                'paid_amount' => 'required|numeric|min:0',
+                'notes' => 'nullable|string|max:255',
+            ]);
+            \Log::info('Validation passed', ['validated' => $validated]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation failed', ['errors' => $e->errors()]);
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput()
+                ->with('error', 'Please check the form data and try again.');
+        }
         
         // Determine sale status
         $totalAmount = $validated['total_amount'];
@@ -117,12 +147,21 @@ class SaleController extends Controller
         
         try {
             // Verify the shop belongs to the user
-            $userShop = auth()->user()->shops()->where('id', $shopId)->first();
+            $userShop = auth()->user()->shops()->where('shops.id', $shopId)->first();
             if (!$userShop) {
                 throw new \Exception('You do not have access to this shop.');
             }
             
             // Create sale
+            \Log::info('About to create sale', [
+                'shop_id' => $shopId,
+                'customer_id' => $validated['customer_id'],
+                'sale_date' => $validated['sale_date'],
+                'total_amount' => $totalAmount,
+                'paid_amount' => $paidAmount,
+                'user_id' => Auth::id(),
+            ]);
+            
             $sale = Sale::create([
                 'shop_id' => $shopId,
                 'customer_id' => $validated['customer_id'],
@@ -134,6 +173,8 @@ class SaleController extends Controller
                 'notes' => $validated['notes'] ?? null,
                 'user_id' => Auth::id(),
             ]);
+            
+            \Log::info('Sale created successfully', ['sale_id' => $sale->id]);
             
             // Create sale items and update stock
             $productIds = $request->input('product_id');
