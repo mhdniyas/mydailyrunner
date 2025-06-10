@@ -22,8 +22,13 @@ class ProductPolicy
      */
     public function view(User $user, Product $product): bool
     {
+        // Admins can view any product
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Check if user has access to the shop that owns this product
-        return $user->shops->contains($product->shop_id);
+        return $user->shops()->where('shops.id', $product->shop_id)->exists();
     }
 
     /**
@@ -31,6 +36,11 @@ class ProductPolicy
      */
     public function create(User $user): bool
     {
+        // Admins can create products
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Only owner, manager, and stock roles can create products
         return $user->hasAnyRole(['owner', 'manager', 'stock']);
     }
@@ -40,8 +50,13 @@ class ProductPolicy
      */
     public function update(User $user, Product $product): bool
     {
+        // Admins can update any product
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Check if user has appropriate role in the shop that owns this product
-        if (!$user->shops->contains($product->shop_id)) {
+        if (!$user->shops()->where('shops.id', $product->shop_id)->exists()) {
             return false;
         }
         
@@ -53,8 +68,13 @@ class ProductPolicy
      */
     public function delete(User $user, Product $product): bool
     {
+        // Admins can delete any product
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Only owner and manager can delete products
-        if (!$user->shops->contains($product->shop_id)) {
+        if (!$user->shops()->where('shops.id', $product->shop_id)->exists()) {
             return false;
         }
         

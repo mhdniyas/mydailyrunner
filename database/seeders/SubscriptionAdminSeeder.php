@@ -22,8 +22,8 @@ class SubscriptionAdminSeeder extends Seeder
         $adminUsers = [
             [
                 'name' => 'Subscription Admin',
-                'email' => 'subscription.admin@mydailyrunner.com',
-                'password' => Hash::make('SecurePass123!'),
+                'email' => 'admin@example.com',
+                'password' => Hash::make('password'),
             ],
             [
                 'name' => 'Main Administrator',

@@ -22,8 +22,13 @@ class StockInPolicy
      */
     public function view(User $user, StockIn $stockIn): bool
     {
+        // Admins can view any stock in
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Check if user has access to the shop that owns this stock in
-        return $user->shops->contains($stockIn->shop_id);
+        return $user->shops()->where('shops.id', $stockIn->shop_id)->exists();
     }
 
     /**
@@ -31,6 +36,11 @@ class StockInPolicy
      */
     public function create(User $user): bool
     {
+        // Admins can create stock ins
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Only owner, manager, and stock roles can create stock ins
         return $user->hasAnyRole(['owner', 'manager', 'stock']);
     }
@@ -40,13 +50,18 @@ class StockInPolicy
      */
     public function update(User $user, StockIn $stockIn): bool
     {
+        // Admins can update any stock in
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Check if user has appropriate role in the shop that owns this stock in
-        if (!$user->shops->contains($stockIn->shop_id)) {
+        if (!$user->shops()->where('shops.id', $stockIn->shop_id)->exists()) {
             return false;
         }
         
-        // Only owner and manager can update stock ins
-        return $user->hasAnyRole(['owner', 'manager'], $stockIn->shop_id);
+        // Owner, manager, and stock roles can update stock ins
+        return $user->hasAnyRole(['owner', 'manager', 'stock'], $stockIn->shop_id);
     }
 
     /**
@@ -54,8 +69,13 @@ class StockInPolicy
      */
     public function delete(User $user, StockIn $stockIn): bool
     {
+        // Admins can delete any stock in
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Only owner and manager can delete stock ins
-        if (!$user->shops->contains($stockIn->shop_id)) {
+        if (!$user->shops()->where('shops.id', $stockIn->shop_id)->exists()) {
             return false;
         }
         

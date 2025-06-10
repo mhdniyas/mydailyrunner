@@ -13,6 +13,11 @@ class ShopPolicy
      */
     public function viewAny(User $user): bool
     {
+        // Admins can view all shops
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // If no shops exist yet, allow first user to create one
         if (Shop::count() === 0) {
             return true;
@@ -25,8 +30,13 @@ class ShopPolicy
      */
     public function view(User $user, Shop $shop): bool
     {
+        // Admins can view any shop
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Check if user has any role in this shop
-        return $user->shops->contains($shop->id);
+        return $user->shops()->where('shops.id', $shop->id)->exists();
     }
 
     /**
@@ -34,6 +44,11 @@ class ShopPolicy
      */
     public function create(User $user): bool
     {
+        // Admins can create shops
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // If no shops exist yet, allow first user to create one
         if (Shop::count() === 0) {
             return true;
@@ -46,6 +61,11 @@ class ShopPolicy
      */
     public function update(User $user, Shop $shop): bool
     {
+        // Admins can update any shop
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         return $user->id === $shop->owner_id;
     }
 
@@ -54,6 +74,11 @@ class ShopPolicy
      */
     public function delete(User $user, Shop $shop): bool
     {
+        // Admins can delete any shop
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         return $user->id === $shop->owner_id;
     }
 }

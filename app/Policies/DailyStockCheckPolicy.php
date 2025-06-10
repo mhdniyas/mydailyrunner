@@ -22,8 +22,13 @@ class DailyStockCheckPolicy
      */
     public function view(User $user, DailyStockCheck $dailyStockCheck): bool
     {
+        // Admins can view any stock check
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Check if user has access to the shop that owns this stock check
-        return $user->shops->contains($dailyStockCheck->shop_id);
+        return $user->shops()->where('shops.id', $dailyStockCheck->shop_id)->exists();
     }
 
     /**
@@ -31,6 +36,11 @@ class DailyStockCheckPolicy
      */
     public function create(User $user): bool
     {
+        // Admins can create stock checks
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Only owner, manager, and stock roles can create stock checks
         return $user->hasAnyRole(['owner', 'manager', 'stock']);
     }
@@ -40,7 +50,12 @@ class DailyStockCheckPolicy
      */
     public function update(User $user, DailyStockCheck $dailyStockCheck): bool
     {
-        // Stock checks should not be updated after creation
+        // Admins can update stock checks if needed
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
+        // Stock checks should not be updated after creation for regular users
         return false;
     }
 
@@ -49,8 +64,13 @@ class DailyStockCheckPolicy
      */
     public function delete(User $user, DailyStockCheck $dailyStockCheck): bool
     {
+        // Admins can delete stock checks
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Only owner and manager can delete stock checks
-        if (!$user->shops->contains($dailyStockCheck->shop_id)) {
+        if (!$user->shops()->where('shops.id', $dailyStockCheck->shop_id)->exists()) {
             return false;
         }
         

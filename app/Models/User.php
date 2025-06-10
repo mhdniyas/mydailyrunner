@@ -81,6 +81,11 @@ class User extends Authenticatable
      */
     public function hasRole($role, $shopId = null)
     {
+        // Admins bypass role checks
+        if ($this->isAdmin()) {
+            return true;
+        }
+        
         if (!$shopId) {
             $shopId = session('current_shop_id');
         }
@@ -109,6 +114,11 @@ class User extends Authenticatable
      */
     public function hasAnyRole(array $roles, $shopId = null)
     {
+        // Admins bypass role checks
+        if ($this->isAdmin()) {
+            return true;
+        }
+        
         if (!$shopId) {
             $shopId = session('current_shop_id');
         }

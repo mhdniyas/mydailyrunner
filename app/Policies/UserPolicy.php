@@ -12,6 +12,11 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
+        // Admins can view all users
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         return $user->hasRole('owner');
     }
 
@@ -20,6 +25,11 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
+        // Admins can view any user
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         return $user->hasRole('owner') || $user->id === $model->id;
     }
 
@@ -28,6 +38,11 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
+        // Admins can create users
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         return $user->hasRole('owner');
     }
 
@@ -36,6 +51,11 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
+        // Admins can update any user
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         return $user->hasRole('owner') || $user->id === $model->id;
     }
 
@@ -49,6 +69,11 @@ class UserPolicy
             return false;
         }
         
+        // Admins can delete any user (except themselves)
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         return $user->hasRole('owner');
     }
 
@@ -57,6 +82,11 @@ class UserPolicy
      */
     public function manageRoles(User $user, User $model): bool
     {
+        // Admins can manage any user's roles
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         return $user->hasRole('owner');
     }
 
@@ -65,6 +95,11 @@ class UserPolicy
      */
     public function invite(User $user, User $model): bool
     {
+        // Admins can send invitations
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         return $user->hasRole('owner');
     }
 }

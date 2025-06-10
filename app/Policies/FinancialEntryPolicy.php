@@ -13,6 +13,11 @@ class FinancialEntryPolicy
      */
     public function viewAny(User $user): bool
     {
+        // Admins can view any financial entries
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Only owner, manager, and finance roles can view financial entries
         return $user->hasAnyRole(['owner', 'manager', 'finance']);
     }
@@ -22,8 +27,13 @@ class FinancialEntryPolicy
      */
     public function view(User $user, FinancialEntry $financialEntry): bool
     {
+        // Admins can view any financial entry
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Check if user has appropriate role in the shop that owns this entry
-        if (!$user->shops->contains($financialEntry->shop_id)) {
+        if (!$user->shops()->where('shops.id', $financialEntry->shop_id)->exists()) {
             return false;
         }
         
@@ -35,6 +45,11 @@ class FinancialEntryPolicy
      */
     public function create(User $user): bool
     {
+        // Admins can create financial entries
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Only owner, manager, and finance roles can create financial entries
         return $user->hasAnyRole(['owner', 'manager', 'finance']);
     }
@@ -44,8 +59,13 @@ class FinancialEntryPolicy
      */
     public function update(User $user, FinancialEntry $financialEntry): bool
     {
+        // Admins can update any financial entry
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Check if user has appropriate role in the shop that owns this entry
-        if (!$user->shops->contains($financialEntry->shop_id)) {
+        if (!$user->shops()->where('shops.id', $financialEntry->shop_id)->exists()) {
             return false;
         }
         
@@ -58,8 +78,13 @@ class FinancialEntryPolicy
      */
     public function delete(User $user, FinancialEntry $financialEntry): bool
     {
+        // Admins can delete any financial entry
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Only owner and manager can delete financial entries
-        if (!$user->shops->contains($financialEntry->shop_id)) {
+        if (!$user->shops()->where('shops.id', $financialEntry->shop_id)->exists()) {
             return false;
         }
         

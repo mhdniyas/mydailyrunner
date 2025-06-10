@@ -20,6 +20,9 @@ class UserSeeder extends Seeder
             'name' => 'System Admin',
             'email' => 'admin@mydailyrunner.com',
             'password' => Hash::make('password123'),
+            'is_subscribed' => true,
+            'is_admin_approved' => true,
+            'email_verified_at' => now(),
         ]);
 
         // Create or get the first shop
@@ -47,21 +50,33 @@ class UserSeeder extends Seeder
                 'name' => 'Shop Owner',
                 'email' => 'owner@mydailyrunner.com',
                 'password' => Hash::make('password123'),
+                'is_subscribed' => true,
+                'is_admin_approved' => true,
+                'email_verified_at' => now(),
             ],
             [
                 'name' => 'Shop Manager',
                 'email' => 'manager@mydailyrunner.com',
                 'password' => Hash::make('password123'),
+                'is_subscribed' => true,
+                'is_admin_approved' => true,
+                'email_verified_at' => now(),
             ],
             [
                 'name' => 'Stock User',
                 'email' => 'stock@mydailyrunner.com',
                 'password' => Hash::make('password123'),
+                'is_subscribed' => true,
+                'is_admin_approved' => true,
+                'email_verified_at' => now(),
             ],
             [
                 'name' => 'Finance User',
                 'email' => 'finance@mydailyrunner.com',
                 'password' => Hash::make('password123'),
+                'is_subscribed' => true,
+                'is_admin_approved' => true,
+                'email_verified_at' => now(),
             ],
         ];
 

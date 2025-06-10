@@ -32,9 +32,38 @@
                 </div>
 
                 <div>
-                    <label for="bags" class="block text-sm font-medium text-gray-700">Number of Bags</label>
-                    <input type="number" name="bags" id="bags" value="{{ old('bags') }}" 
-                           min="1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500" required>
+                    <label for="bags" class="block text-sm font-medium text-gray-700">
+                        Number of Bags
+                        <span id="bagSuggestion" class="text-xs text-blue-600 ml-2 hidden">(Suggested: <span id="suggestedBags">-</span>)</span>
+                    </label>
+                    <div class="relative">
+                        <input type="number" name="bags" id="bags" value="{{ old('bags') }}" 
+                               min="1" step="1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 pr-20" required>
+                        <button type="button" id="useSuggestionBtn" 
+                                class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded hover:bg-blue-200 hidden">
+                            Use
+                        </button>
+                    </div>
+                    <div class="mt-1">
+                        <p class="text-xs text-gray-600">Default calculation: Quantity ÷ 50 (example guideline)</p>
+                        <div id="bagCalculationExample" class="text-xs mt-2 hidden">
+                            <p class="text-blue-600 font-medium">Exact calculation: <span id="calculationExample"></span></p>
+                            <div id="bagOptions" class="mt-2 space-y-1 hidden">
+                                <div class="flex items-center justify-between bg-yellow-50 p-2 rounded border">
+                                    <span class="text-gray-700">Option 1: <span id="option1Text"></span></span>
+                                    <button type="button" id="useOption1Btn" class="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded hover:bg-yellow-300">
+                                        Use <span id="option1Bags"></span> bags
+                                    </button>
+                                </div>
+                                <div class="flex items-center justify-between bg-green-50 p-2 rounded border">
+                                    <span class="text-gray-700">Option 2: <span id="option2Text"></span></span>
+                                    <button type="button" id="useOption2Btn" class="text-xs bg-green-200 text-green-800 px-2 py-1 rounded hover:bg-green-300">
+                                        Use <span id="option2Bags"></span> bags
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     @error('bags')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -88,14 +117,14 @@
                                 </button>
                                 
                                 <!-- Calculation Results -->
-                                <div id="calculationResults" class="mt-3 space-y-2 hidden">
-                                    <div class="text-xs bg-white p-2 rounded border">
-                                        <div class="font-medium text-gray-700">Formula 1: <span id="result1">-</span></div>
-                                        <div class="text-gray-500">(Quantity ÷ Bags) - 0.5</div>
+                                <div id="calculationResults" class="mt-3 space-y-2">
+                                    <div class="text-xs bg-green-50 p-2 rounded border border-green-200">
+                                        <div class="font-medium text-green-700">Formula 1: <span id="result1">-</span></div>
+                                        <div class="text-green-600">(Quantity ÷ Bags) - 0.5</div>
                                     </div>
-                                    <div class="text-xs bg-white p-2 rounded border">
-                                        <div class="font-medium text-gray-700">Formula 2: <span id="result2">-</span></div>
-                                        <div class="text-gray-500">Quantity ÷ Bags</div>
+                                    <div class="text-xs bg-blue-50 p-2 rounded border border-blue-200">
+                                        <div class="font-medium text-blue-700">Formula 2: <span id="result2">-</span></div>
+                                        <div class="text-blue-600">Quantity ÷ Bags</div>
                                     </div>
                                 </div>
                             </div>
@@ -146,6 +175,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
             const quantityInput = document.getElementById('quantity');
             const bagsInput = document.getElementById('bags');
             const calculateBtn = document.getElementById('calculateBtn');
@@ -156,6 +186,94 @@
             const manualBagWeight = document.getElementById('manual_bag_weight');
             const manualOverrideDiv = document.getElementById('manualOverrideDiv');
             const calculationMethodInputs = document.querySelectorAll('input[name="calculation_method"]');
+            const bagSuggestion = document.getElementById('bagSuggestion');
+            const suggestedBags = document.getElementById('suggestedBags');
+            const useSuggestionBtn = document.getElementById('useSuggestionBtn');
+            const bagCalculationExample = document.getElementById('bagCalculationExample');
+            const calculationExample = document.getElementById('calculationExample');
+            const bagOptions = document.getElementById('bagOptions');
+            const option1Text = document.getElementById('option1Text');
+            const option2Text = document.getElementById('option2Text');
+            const option1Bags = document.getElementById('option1Bags');
+            const option2Bags = document.getElementById('option2Bags');
+            const useOption1Btn = document.getElementById('useOption1Btn');
+            const useOption2Btn = document.getElementById('useOption2Btn');
+
+            // Calculate suggested number of bags
+            function updateBagSuggestion() {
+                const quantity = parseFloat(quantityInput.value) || 0;
+                
+                if (quantity > 0) {
+                    const exactBags = quantity / 50;
+                    const roundedDown = Math.floor(exactBags);
+                    const roundedUp = Math.ceil(exactBags);
+                    
+                    // Show exact calculation
+                    calculationExample.textContent = `${quantity} ÷ 50 = ${exactBags.toFixed(2)} bags`;
+                    bagCalculationExample.classList.remove('hidden');
+                    
+                    // If it's not a whole number, show options
+                    if (exactBags % 1 !== 0) {
+                        // Option 1: Round down (fewer bags, heavier per bag)
+                        const option1Weight = roundedDown > 0 ? (quantity / roundedDown).toFixed(2) : 0;
+                        option1Text.textContent = `${roundedDown} bags = ${option1Weight} kg per bag (heavier)`;
+                        option1Bags.textContent = roundedDown;
+                        
+                        // Option 2: Round up (more bags, lighter per bag)
+                        const option2Weight = (quantity / roundedUp).toFixed(2);
+                        option2Text.textContent = `${roundedUp} bags = ${option2Weight} kg per bag (lighter)`;
+                        option2Bags.textContent = roundedUp;
+                        
+                        bagOptions.classList.remove('hidden');
+                        
+                        // Use the rounded up value as the main suggestion
+                        suggestedBags.textContent = roundedUp;
+                        bagSuggestion.classList.remove('hidden');
+                        useSuggestionBtn.classList.remove('hidden');
+                    } else {
+                        // Exact whole number - hide options, show simple suggestion
+                        bagOptions.classList.add('hidden');
+                        suggestedBags.textContent = exactBags;
+                        bagSuggestion.classList.remove('hidden');
+                        useSuggestionBtn.classList.remove('hidden');
+                    }
+                } else {
+                    bagSuggestion.classList.add('hidden');
+                    useSuggestionBtn.classList.add('hidden');
+                    bagCalculationExample.classList.add('hidden');
+                    bagOptions.classList.add('hidden');
+                }
+            }
+
+            // Use suggested bags
+            function useSuggestedBags() {
+                const suggested = parseInt(suggestedBags.textContent);
+                if (suggested > 0) {
+                    bagsInput.value = suggested; // This should be a whole number like 14
+                    calculateValues(); // Auto-calculate when suggestion is used
+                    updateFinalBagWeight();
+                }
+            }
+
+            // Use option 1 (rounded down)
+            function useOption1() {
+                const bags = parseInt(option1Bags.textContent);
+                if (bags > 0) {
+                    bagsInput.value = bags;
+                    calculateValues();
+                    updateFinalBagWeight();
+                }
+            }
+
+            // Use option 2 (rounded up)
+            function useOption2() {
+                const bags = parseInt(option2Bags.textContent);
+                if (bags > 0) {
+                    bagsInput.value = bags;
+                    calculateValues();
+                    updateFinalBagWeight();
+                }
+            }
 
             // Show/hide manual override input
             function toggleManualOverride() {
@@ -179,12 +297,9 @@
 
                     result1.textContent = formula1Result.toFixed(2);
                     result2.textContent = formula2Result.toFixed(2);
-                    
-                    calculationResults.classList.remove('hidden');
                 } else {
                     result1.textContent = '-';
                     result2.textContent = '-';
-                    calculationResults.classList.add('hidden');
                 }
                 
                 updateFinalBagWeight();
@@ -222,11 +337,26 @@
             });
 
             manualBagWeight.addEventListener('input', updateFinalBagWeight);
-            quantityInput.addEventListener('input', updateFinalBagWeight);
-            bagsInput.addEventListener('input', updateFinalBagWeight);
+            
+            quantityInput.addEventListener('input', function() {
+                updateBagSuggestion();
+                calculateValues(); // Auto-calculate when quantity changes
+                updateFinalBagWeight();
+            });
+            
+            bagsInput.addEventListener('input', function() {
+                calculateValues(); // Auto-calculate when bags change
+                updateFinalBagWeight();
+            });
+            
+            useSuggestionBtn.addEventListener('click', useSuggestedBags);
+            useOption1Btn.addEventListener('click', useOption1);
+            useOption2Btn.addEventListener('click', useOption2);
 
             // Initial setup
             toggleManualOverride();
+            updateBagSuggestion();
+            calculateValues(); // Calculate on page load if values exist
         });
     </script>
 </x-app-layout>

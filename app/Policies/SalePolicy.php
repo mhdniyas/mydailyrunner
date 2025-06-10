@@ -22,8 +22,13 @@ class SalePolicy
      */
     public function view(User $user, Sale $sale): bool
     {
+        // Admins can view any sale
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Check if user has access to the shop that owns this sale
-        return $user->shops->contains($sale->shop_id);
+        return $user->shops()->where('shops.id', $sale->shop_id)->exists();
     }
 
     /**
@@ -31,6 +36,11 @@ class SalePolicy
      */
     public function create(User $user): bool
     {
+        // Admins can create sales
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Only owner, manager, and finance roles can create sales
         return $user->hasAnyRole(['owner', 'manager', 'finance']);
     }
@@ -40,8 +50,13 @@ class SalePolicy
      */
     public function update(User $user, Sale $sale): bool
     {
+        // Admins can update any sale
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Check if user has appropriate role in the shop that owns this sale
-        if (!$user->shops->contains($sale->shop_id)) {
+        if (!$user->shops()->where('shops.id', $sale->shop_id)->exists()) {
             return false;
         }
         
@@ -54,8 +69,13 @@ class SalePolicy
      */
     public function delete(User $user, Sale $sale): bool
     {
+        // Admins can delete any sale
+        if ($user->isAdmin()) {
+            return true;
+        }
+        
         // Only owner and manager can delete sales
-        if (!$user->shops->contains($sale->shop_id)) {
+        if (!$user->shops()->where('shops.id', $sale->shop_id)->exists()) {
             return false;
         }
         
