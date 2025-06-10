@@ -101,8 +101,16 @@ class DashboardController extends Controller
         
         $salesChartData = $monthlySales->pluck('total');
         
-        // Get all products for reference
-        $allProducts = Product::where('shop_id', $shopId)->get();
+        // Get all products for reference with eager loading of last discrepancy
+        $allProducts = Product::where('shop_id', $shopId)
+            ->orderBy('name')
+            ->get();
+        
+        // Get the latest discrepancy for each product
+        $productDiscrepancies = DailyStockCheck::whereIn('product_id', $allProducts->pluck('id'))
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->groupBy('product_id');
         
         return view('dashboard', [
             'totalStockValue' => $totalStockValue,
@@ -119,6 +127,7 @@ class DashboardController extends Controller
             'salesChartLabels' => $salesChartLabels,
             'salesChartData' => $salesChartData,
             'allProducts' => $allProducts,
+            'productDiscrepancies' => $productDiscrepancies,
             'title' => 'Dashboard',
             'subtitle' => 'Shop overview and analytics'
         ]);

@@ -3,55 +3,363 @@
     <x-slot name="subtitle">Shop overview and analytics</x-slot>
 
     <!-- Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-primary-100 text-primary-800">
-                    <i class="fas fa-boxes fa-2x"></i>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
+    <!-- Stock Value Card -->
+    <div class="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 overflow-hidden">
+        <!-- Background Gradient -->
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+        <!-- Shimmer Effect -->
+        <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+        
+        <div class="relative p-6">
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <div class="p-4 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-lg shadow-blue-200 group-hover:shadow-blue-300 transition-shadow duration-300">
+                        <i class="fas fa-boxes text-2xl group-hover:scale-110 transition-transform duration-300"></i>
+                    </div>
+                    <!-- Pulse Ring -->
+                    <div class="absolute inset-0 rounded-2xl bg-blue-400 opacity-20 group-hover:animate-ping"></div>
                 </div>
-                <div class="ml-4">
-                    <p class="text-sm text-gray-500 font-medium">Stock Value</p>
-                    <p class="text-xl font-semibold">{{ number_format($totalStockValue, 2) }}</p>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-600 mb-1 group-hover:text-blue-600 transition-colors duration-300">
+                        Stock Value
+                    </p>
+                    <p class="text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-blue-700 transition-colors duration-300 truncate">
+                        ₹{{ number_format($totalStockValue, 2) }}
+                    </p>
+                    <div class="mt-2 flex items-center text-xs text-green-600">
+                        <i class="fas fa-chart-line mr-1"></i>
+                        <span>Total Inventory</span>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-accent-100 text-accent-800">
-                    <i class="fas fa-receipt fa-2x"></i>
+        <!-- Corner Decoration -->
+        <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-200/20 to-blue-400/30 rounded-bl-full transform translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-500"></div>
+    </div>
+    
+    <!-- Today's Sales Card -->
+    <div class="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 overflow-hidden">
+        <!-- Background Gradient -->
+        <div class="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-green-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+        <!-- Shimmer Effect -->
+        <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+        
+        <div class="relative p-6">
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <div class="p-4 rounded-2xl bg-gradient-to-br from-emerald-400 to-green-600 text-white shadow-lg shadow-emerald-200 group-hover:shadow-emerald-300 transition-shadow duration-300">
+                        <i class="fas fa-receipt text-2xl group-hover:scale-110 transition-transform duration-300"></i>
+                    </div>
+                    <!-- Pulse Ring -->
+                    <div class="absolute inset-0 rounded-2xl bg-emerald-400 opacity-20 group-hover:animate-ping"></div>
                 </div>
-                <div class="ml-4">
-                    <p class="text-sm text-gray-500 font-medium">Today's Sales</p>
-                    <p class="text-xl font-semibold">{{ number_format($todaySales, 2) }}</p>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-600 mb-1 group-hover:text-emerald-600 transition-colors duration-300">
+                        Today's Sales
+                    </p>
+                    <p class="text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-emerald-700 transition-colors duration-300 truncate">
+                        ₹{{ number_format($todaySales, 2) }}
+                    </p>
+                    <div class="mt-2 flex items-center text-xs text-emerald-600">
+                        <i class="fas fa-calendar-day mr-1"></i>
+                        <span>{{ date('M d, Y') }}</span>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-green-100 text-green-800">
-                    <i class="fas fa-arrow-down fa-2x"></i>
+        <!-- Corner Decoration -->
+        <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-emerald-200/20 to-green-400/30 rounded-bl-full transform translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-500"></div>
+    </div>
+    
+    <!-- Cash In Card -->
+    <div class="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 overflow-hidden">
+        <!-- Background Gradient -->
+        <div class="absolute inset-0 bg-gradient-to-br from-green-50/50 to-emerald-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+        <!-- Shimmer Effect -->
+        <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+        
+        <div class="relative p-6">
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <div class="p-4 rounded-2xl bg-gradient-to-br from-green-400 to-green-600 text-white shadow-lg shadow-green-200 group-hover:shadow-green-300 transition-shadow duration-300">
+                        <i class="fas fa-arrow-down text-2xl group-hover:animate-bounce transition-transform duration-300"></i>
+                    </div>
+                    <!-- Pulse Ring -->
+                    <div class="absolute inset-0 rounded-2xl bg-green-400 opacity-20 group-hover:animate-ping"></div>
                 </div>
-                <div class="ml-4">
-                    <p class="text-sm text-gray-500 font-medium">Cash In</p>
-                    <p class="text-xl font-semibold">{{ number_format($cashIn, 2) }}</p>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-600 mb-1 group-hover:text-green-600 transition-colors duration-300">
+                        Cash In
+                    </p>
+                    <p class="text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-green-700 transition-colors duration-300 truncate">
+                        ₹{{ number_format($cashIn, 2) }}
+                    </p>
+                    <div class="mt-2 flex items-center text-xs text-green-600">
+                        <i class="fas fa-plus-circle mr-1"></i>
+                        <span>Inflow</span>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div class="p-3 rounded-full bg-red-100 text-red-800">
-                    <i class="fas fa-arrow-up fa-2x"></i>
+        <!-- Corner Decoration -->
+        <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-green-200/20 to-green-400/30 rounded-bl-full transform translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-500"></div>
+    </div>
+    
+    <!-- Cash Out Card -->
+    <div class="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 overflow-hidden">
+        <!-- Background Gradient -->
+        <div class="absolute inset-0 bg-gradient-to-br from-red-50/50 to-pink-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+        <!-- Shimmer Effect -->
+        <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+        
+        <div class="relative p-6">
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <div class="p-4 rounded-2xl bg-gradient-to-br from-red-400 to-red-600 text-white shadow-lg shadow-red-200 group-hover:shadow-red-300 transition-shadow duration-300">
+                        <i class="fas fa-arrow-up text-2xl group-hover:animate-bounce transition-transform duration-300"></i>
+                    </div>
+                    <!-- Pulse Ring -->
+                    <div class="absolute inset-0 rounded-2xl bg-red-400 opacity-20 group-hover:animate-ping"></div>
                 </div>
-                <div class="ml-4">
-                    <p class="text-sm text-gray-500 font-medium">Cash Out</p>
-                    <p class="text-xl font-semibold">{{ number_format($cashOut, 2) }}</p>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-600 mb-1 group-hover:text-red-600 transition-colors duration-300">
+                        Cash Out
+                    </p>
+                    <p class="text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-red-700 transition-colors duration-300 truncate">
+                        ₹{{ number_format($cashOut, 2) }}
+                    </p>
+                    <div class="mt-2 flex items-center text-xs text-red-600">
+                        <i class="fas fa-minus-circle mr-1"></i>
+                        <span>Outflow</span>
+                    </div>
                 </div>
             </div>
+        </div>
+        
+        <!-- Corner Decoration -->
+        <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-red-200/20 to-red-400/30 rounded-bl-full transform translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-500"></div>
+    </div>
+</div>
+
+<style>
+    /* Animation keyframes */
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+    
+    /* Responsive text sizing */
+    @media (max-width: 640px) {
+        .group .text-xl {
+            font-size: 1.125rem; /* Slightly smaller on mobile */
+        }
+    }
+    
+    /* Ensure proper spacing on mobile */
+    @media (max-width: 480px) {
+        .group {
+            margin-bottom: 0.5rem;
+        }
+        
+        .group .p-6 {
+            padding: 1rem;
+        }
+        
+        .group .space-x-4 > * + * {
+            margin-left: 0.75rem;
+        }
+    }
+</style>
+    <!-- Product Inventory Cards -->
+<div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl p-6 mb-6 border border-gray-100 relative overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 bg-gradient-to-r from-blue-50/30 to-purple-50/30 opacity-50"></div>
+    <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100/20 to-purple-100/20 rounded-full -translate-y-16 translate-x-16"></div>
+    
+    <div class="relative z-10">
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-boxes text-white text-lg"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                    Product Inventory
+                </h3>
+            </div>
+            <a href="{{ route('products.index') }}" class="group inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                <span>View All</span>
+                <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
+            </a>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            @php
+                $products = $allProducts->take(6);
+                
+                // Function to get initials from product name
+                function getInitials($name) {
+                    $words = explode(' ', trim($name));
+                    if (count($words) == 1) {
+                        return $name;
+                    }
+                    $initials = '';
+                    foreach ($words as $word) {
+                        $initials .= strtoupper(substr($word, 0, 1));
+                    }
+                    return $initials;
+                }
+            @endphp
+            
+            @foreach($products as $index => $product)
+                @php
+                    $lastDiscrepancy = isset($productDiscrepancies[$product->id]) ? $productDiscrepancies[$product->id]->first() : null;
+                    $isLowStock = $product->current_stock <= $product->min_stock_level;
+                    $displayName = getInitials($product->name);
+                @endphp
+                
+                <div class="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 overflow-hidden"
+                     style="animation: slideUp 0.6s ease-out {{ $index * 0.1 }}s both;">
+                    
+                    <!-- Card Gradient Overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-gray-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    <!-- Shimmer Effect -->
+                    <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+                    
+                    <div class="relative p-6">
+                        <!-- Header -->
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-gradient-to-br {{ $isLowStock ? 'from-red-400 to-red-600' : 'from-green-400 to-blue-500' }} rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                                    {{ $displayName }}
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900 text-lg group-hover:text-blue-600 transition-colors duration-300" title="{{ $product->name }}">
+                                        {{ $displayName }}
+                                    </h4>
+                                    <p class="text-xs text-gray-500 mt-1">{{ $product->unit }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="relative">
+                                <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 {{ $isLowStock ? 'bg-red-100 text-red-800 shadow-red-200' : 'bg-green-100 text-green-800 shadow-green-200' }} shadow-lg">
+                                    <div class="w-2 h-2 rounded-full {{ $isLowStock ? 'bg-red-500 animate-pulse' : 'bg-green-500' }} mr-2"></div>
+                                    {{ $isLowStock ? 'Low Stock' : 'In Stock' }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Stock Information -->
+                        <div class="bg-gray-50 rounded-xl p-4 mb-4 group-hover:bg-gray-100 transition-colors duration-300">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium text-gray-600">Stock:</span>
+                                <span class="text-lg font-bold {{ $isLowStock ? 'text-red-600' : 'text-green-600' }}">
+                                    {{ number_format($product->current_stock) }} {{ $product->unit }}
+                                </span>
+                            </div>
+                            
+                            <!-- Stock Level Indicator -->
+                            <div class="mt-3">
+                                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                    <span>Stock Level</span>
+                                    <span>Min: {{ $product->min_stock_level }}</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                                    @php
+                                        $percentage = $product->min_stock_level > 0 ? min(($product->current_stock / $product->min_stock_level) * 100, 100) : 100;
+                                    @endphp
+                                    <div class="h-2 rounded-full transition-all duration-1000 {{ $isLowStock ? 'bg-gradient-to-r from-red-400 to-red-600' : 'bg-gradient-to-r from-green-400 to-blue-500' }}"
+                                         style="width: {{ $percentage }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Last Discrepancy -->
+                        @if($lastDiscrepancy)
+                            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 mb-4 border border-blue-100">
+                                <p class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                                    <i class="fas fa-chart-line mr-2 text-blue-500"></i>
+                                    Last Discrepancy:
+                                </p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-gray-600">{{ $lastDiscrepancy->created_at->format('M d, Y') }}</span>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold {{ $lastDiscrepancy->discrepancy > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                        <i class="fas {{ $lastDiscrepancy->discrepancy > 0 ? 'fa-arrow-up text-green-500' : 'fa-arrow-down text-red-500' }} mr-1"></i>
+                                        {{ $lastDiscrepancy->discrepancy > 0 ? '+' : '' }}{{ $lastDiscrepancy->discrepancy }} {{ $product->unit }}
+                                    </span>
+                                </div>
+                            </div>
+                        @else
+                            <div class="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-200">
+                                <p class="text-sm text-gray-500 text-center flex items-center justify-center">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    No Discrepancy Recorded
+                                </p>
+                            </div>
+                        @endif
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex space-x-3">
+                            <a href="{{ route('products.show', $product) }}" 
+                               class="flex-1 inline-flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 group">
+                                <i class="fas fa-eye mr-2 group-hover:scale-110 transition-transform duration-300"></i>
+                                Details
+                            </a>
+                            
+                            <a href="{{ route('stock-ins.create') }}?product_id={{ $product->id }}" 
+                               class="flex-1 inline-flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-medium rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 group">
+                                <i class="fas fa-plus-circle mr-2 group-hover:rotate-90 transition-transform duration-300"></i>
+                                Add Stock
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Corner Decoration -->
+                    <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br {{ $isLowStock ? 'from-red-400/10 to-red-600/20' : 'from-blue-400/10 to-purple-600/20' }} rounded-bl-full transform translate-x-10 -translate-y-10 group-hover:scale-110 transition-transform duration-500"></div>
+                </div>
+            @endforeach
         </div>
     </div>
+    
+    <style>
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .group:hover .fa-eye {
+            animation: pulse 1s infinite;
+        }
+        
+        .group:hover .fa-plus-circle {
+            animation: bounce 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+    </style>
+</div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Sales Chart -->
@@ -80,7 +388,7 @@
                                     {{ $product->name }}
                                 </a>
                                 <p class="text-sm text-gray-500">
-                                    {{ $product->current_stock }} / {{ $product->min_stock_level }} {{ $product->unit }}
+                                    CS: {{ $product->current_stock }} {{ $product->unit }}
                                 </p>
                             </div>
                             <a href="{{ route('stock-ins.create') }}" class="text-accent-600 hover:text-accent-900">

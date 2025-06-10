@@ -1,7 +1,16 @@
 #!/bin/bash
 
-# Quick commit script with default message
+# Quick commit script with Laravel cache clearing and optimization
 COMMIT_MSG=${1:-"Update: auto-commit changes"}
+
+echo "🧹 Clearing Laravel caches..."
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+
+echo "⚡ Optimizing Laravel..."
+php artisan optimize
 
 echo "📝 Adding all changes..."
 git add .
