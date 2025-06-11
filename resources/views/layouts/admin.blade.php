@@ -468,12 +468,41 @@
                         </div>
 
                         <div class="flex items-center space-x-2 lg:space-x-4">
-                            <div class="text-right hidden sm:block">
-                                <p class="text-sm font-medium text-primary-900">{{ Auth::user()->name }}</p>
-                                <p class="text-xs text-primary-500">{{ ucfirst(session('current_shop_role') ?? 'User') }}</p>
-                            </div>
-                            <div class="w-8 h-8 lg:w-10 lg:h-10 bg-accent-600 rounded-full flex items-center justify-center transition-transform hover:scale-105">
-                                <i class="fas fa-user text-white text-sm lg:text-base"></i>
+                            <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                                <div class="flex items-center space-x-2 cursor-pointer" @click="open = !open">
+                                    <div class="text-right hidden sm:block">
+                                        <p class="text-sm font-medium text-primary-900">{{ Auth::user()->name }}</p>
+                                        <p class="text-xs text-primary-500">{{ ucfirst(session('current_shop_role') ?? 'User') }}</p>
+                                    </div>
+                                    <div class="w-8 h-8 lg:w-10 lg:h-10 bg-accent-600 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 hover:shadow-md">
+                                        <i class="fas fa-user text-white text-sm lg:text-base"></i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Profile Dropdown Menu -->
+                                <div x-show="open" 
+                                     x-transition:enter="transition ease-out duration-200"
+                                     x-transition:enter-start="opacity-0 scale-95"
+                                     x-transition:enter-end="opacity-100 scale-100"
+                                     x-transition:leave="transition ease-in duration-75"
+                                     x-transition:leave-start="opacity-100 scale-100"
+                                     x-transition:leave-end="opacity-0 scale-95"
+                                     class="absolute right-0 mt-2 w-48 py-2 bg-white rounded-md shadow-luxury z-50 border border-primary-100"
+                                     style="display: none;">
+                                    <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-primary-700 hover:bg-primary-50 transition-colors duration-200">
+                                        <i class="fas fa-user-edit mr-2"></i> Edit Profile
+                                    </a>
+                                    <a href="{{ route('profile.edit') }}#password" class="block px-4 py-2 text-sm text-primary-700 hover:bg-primary-50 transition-colors duration-200">
+                                        <i class="fas fa-key mr-2"></i> Change Password
+                                    </a>
+                                    <div class="border-t border-primary-100 my-1"></div>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200">
+                                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
