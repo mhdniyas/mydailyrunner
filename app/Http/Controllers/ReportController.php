@@ -9,6 +9,7 @@ use App\Models\DailyStockCheck;
 use App\Models\FinancialEntry;
 use App\Models\FinancialCategory;
 use App\Models\Customer;
+use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -780,5 +781,90 @@ class ReportController extends Controller
         foreach (range('A', 'E') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
+    }
+    
+    /**
+     * Display the category-wise discrepancy report.
+     */
+    public function categoryDiscrepancies(Request $request)
+    {
+        $shopId = session('current_shop_id');
+        
+        // Get date range
+        $startDate = $request->input('start_date', now()->subDays(30)->format('Y-m-d'));
+        $endDate = $request->input('end_date', now()->format('Y-m-d'));
+        
+        // Get all categories with their products and discrepancies
+        $categories = ProductCategory::where('shop_id', $shopId)
+            ->with(['products' => function($query) {
+                $query->withCount('stockChecks');
+            }])
+            ->get();
+            
+        // Calculate discrepancies for each category
+        $categoryData = [];
+        
+        foreach ($categories as $category) {
+            $productIds = $category->products->pluck('id')->toArray();
+            
+            if (empty($productIds)) {
+                continue;
+            }
+            
+            // Get discrepancies for products in this category
+            $discrepancies = DailyStockCheck::whereIn('product_id', $productIds)
+                ->where('shop_id', $shopId)
+                ->whereBetween(DB::raw('DATE(created_at)'), [$startDate, $endDate])
+                ->select(
+                    DB::raw('SUM(discrepancy) as total_discrepancy'),
+                    DB::raw('SUM(CASE WHEN discrepancy != 0 THEN 1 ELSE 0 END) as discrepancy_count'),
+                    DB::raw('COUNT(*) as check_count')
+                )
+                ->first();
+                
+            $categoryData[$category->id] = [
+                'category' => $category,
+                'total_discrepancy' => $discrepancies->total_discrepancy ?? 0,
+                'discrepancy_count' => $discrepancies->discrepancy_count ?? 0,
+                'check_count' => $discrepancies->check_count ?? 0,
+                'product_count' => $category->products->count(),
+            ];
+        }
+        
+        // Also include products without a category
+        $productsWithoutCategory = Product::whereNull('category_id')
+            ->where('shop_id', $shopId)
+            ->get();
+            
+        if ($productsWithoutCategory->count() > 0) {
+            $productIds = $productsWithoutCategory->pluck('id')->toArray();
+            
+            // Get discrepancies for products without category
+            $discrepancies = DailyStockCheck::whereIn('product_id', $productIds)
+                ->where('shop_id', $shopId)
+                ->whereBetween(DB::raw('DATE(created_at)'), [$startDate, $endDate])
+                ->select(
+                    DB::raw('SUM(discrepancy) as total_discrepancy'),
+                    DB::raw('SUM(CASE WHEN discrepancy != 0 THEN 1 ELSE 0 END) as discrepancy_count'),
+                    DB::raw('COUNT(*) as check_count')
+                )
+                ->first();
+                
+            $categoryData['uncategorized'] = [
+                'category' => null,
+                'total_discrepancy' => $discrepancies->total_discrepancy ?? 0,
+                'discrepancy_count' => $discrepancies->discrepancy_count ?? 0,
+                'check_count' => $discrepancies->check_count ?? 0,
+                'product_count' => $productsWithoutCategory->count(),
+            ];
+        }
+        
+        return view('reports.category-discrepancies', [
+            'categoryData' => $categoryData,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'title' => 'Category-wise Discrepancy Report',
+            'subtitle' => 'Analysis of discrepancies by product category'
+        ]);
     }
 }

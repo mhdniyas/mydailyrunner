@@ -335,9 +335,14 @@
                                     <span>Customer Dues</span>
                                 </a>
                                 <a href="{{ route('reports.bag-weights') }}" 
-                                   class="flex items-center px-4 py-2 mb-1 text-primary-300 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('reports.bag-weights') ? 'bg-primary-700 text-white' : '' }}">
+                                   class="flex items-center px-4 py-2 text-primary-300 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('reports.bag-weights') ? 'bg-primary-700 text-white' : '' }}">
                                     <i class="fas fa-weight-hanging mr-3 text-xs"></i>
                                     <span>Bag Weights</span>
+                                </a>
+                                <a href="{{ route('reports.category-discrepancies') }}" 
+                                   class="flex items-center px-4 py-2 mb-1 text-primary-300 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('reports.category-discrepancies') ? 'bg-primary-700 text-white' : '' }}">
+                                    <i class="fas fa-layer-group mr-3 text-xs"></i>
+                                    <span>Category Discrepancies</span>
                                 </a>
                             </div>
                         </div>
@@ -374,6 +379,11 @@
                                    class="flex items-center px-4 py-2 mt-1 text-primary-300 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('products.*') ? 'bg-primary-700 text-white' : '' }}">
                                     <i class="fas fa-box mr-3 text-xs"></i>
                                     <span>Products</span>
+                                </a>
+                                <a href="{{ route('product-categories.index') }}" 
+                                   class="flex items-center px-4 py-2 text-primary-300 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('product-categories.*') ? 'bg-primary-700 text-white' : '' }}">
+                                    <i class="fas fa-tags mr-3 text-xs"></i>
+                                    <span>Product Categories</span>
                                 </a>
 
                                 @if(Auth::user()->isAdmin())

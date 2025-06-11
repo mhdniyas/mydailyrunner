@@ -72,6 +72,18 @@
                     <p class="font-medium">{{ $product->avg_bag_weight }} {{ $product->unit }}</p>
                 </div>
                 @endif
+                <div>
+                    <p class="text-sm text-gray-500">Category</p>
+                    <p class="font-medium">
+                        @if($product->category)
+                            <a href="{{ route('product-categories.show', $product->category) }}" class="text-primary-600 hover:text-primary-900">
+                                {{ $product->category->name }}
+                            </a>
+                        @else
+                            <span class="text-gray-500">No Category</span>
+                        @endif
+                    </p>
+                </div>
                 <div class="md:col-span-2">
                     <p class="text-sm text-gray-500">Description</p>
                     <p class="font-medium">{{ $product->description ?? 'No description provided.' }}</p>

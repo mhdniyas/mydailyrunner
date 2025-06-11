@@ -22,12 +22,25 @@ class ProductController extends Controller
             $query->where('name', 'like', '%' . $request->search . '%');
         }
         
-        $products = $query->orderBy('name')
+        // Filter by category if provided
+        if ($request->has('category_id') && $request->category_id != '') {
+            $query->where('category_id', $request->category_id);
+        }
+        
+        // Get all categories for the filter
+        $categories = \App\Models\ProductCategory::where('shop_id', $shopId)
+            ->orderBy('name')
+            ->get();
+        
+        $products = $query->with('category')
+            ->orderBy('name')
             ->paginate(15);
             
         return view('products.index', [
             'products' => $products,
+            'categories' => $categories,
             'search' => $request->search ?? '',
+            'selectedCategory' => $request->category_id ?? '',
             'title' => 'Products',
             'subtitle' => 'Manage your product catalog'
         ]);
@@ -38,8 +51,14 @@ class ProductController extends Controller
      */
     public function create()
     {
+        $shopId = session('current_shop_id');
+        $categories = \App\Models\ProductCategory::where('shop_id', $shopId)
+            ->orderBy('name')
+            ->get();
+            
         return view('products.form', [
             'product' => null,
+            'categories' => $categories,
             'title' => 'Add Product',
             'subtitle' => 'Create a new product'
         ]);
@@ -60,11 +79,13 @@ class ProductController extends Controller
             'current_stock' => 'required|numeric|min:0',
             'avg_cost' => 'nullable|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
+            'category_id' => 'nullable|exists:product_categories,id',
         ]);
         
         // Create product
         $product = Product::create([
             'shop_id' => $shopId,
+            'category_id' => $validated['category_id'] ?? null,
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
             'unit' => $validated['unit'],
@@ -122,8 +143,14 @@ class ProductController extends Controller
     {
         $this->authorize('update', $product);
         
+        $shopId = session('current_shop_id');
+        $categories = \App\Models\ProductCategory::where('shop_id', $shopId)
+            ->orderBy('name')
+            ->get();
+        
         return view('products.form', [
             'product' => $product,
+            'categories' => $categories,
             'title' => 'Edit Product',
             'subtitle' => 'Modify product information'
         ]);
@@ -144,6 +171,7 @@ class ProductController extends Controller
             'current_stock' => 'required|numeric|min:0',
             'avg_cost' => 'nullable|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
+            'category_id' => 'nullable|exists:product_categories,id',
         ]);
         
         // Update product
@@ -155,6 +183,7 @@ class ProductController extends Controller
             'current_stock' => $validated['current_stock'],
             'avg_cost' => $validated['avg_cost'] ?? 0,
             'sale_price' => $validated['sale_price'] ?? 0,
+            'category_id' => $validated['category_id'] ?? null,
         ]);
         
         return redirect()->route('products.index')

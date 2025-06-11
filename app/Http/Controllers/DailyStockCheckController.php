@@ -70,6 +70,9 @@ class DailyStockCheckController extends Controller
         $shopId = session('current_shop_id');
         $products = Product::where('shop_id', $shopId)->orderBy('name')->get();
         
+        // Load latest bag averages for each product
+        $bagAverages = $this->getLatestBagAveragesForProducts($products);
+        
         // Check if morning check already done today
         $morningDone = DailyStockCheck::where('shop_id', $shopId)
             ->whereDate('created_at', now())
@@ -89,6 +92,7 @@ class DailyStockCheckController extends Controller
             'checkType' => $checkType,
             'morningDone' => $morningDone,
             'eveningDone' => $eveningDone,
+            'bagAverages' => $bagAverages,
             'title' => 'New Stock Check',
             'subtitle' => 'Record physical inventory count'
         ]);
@@ -107,6 +111,9 @@ class DailyStockCheckController extends Controller
         $shopId = session('current_shop_id');
         $products = Product::where('shop_id', $shopId)->orderBy('name')->get();
         
+        // Load latest bag averages for each product
+        $bagAverages = $this->getLatestBagAveragesForProducts($products);
+        
         // Check if this type already done today
         $alreadyDone = DailyStockCheck::where('shop_id', $shopId)
             ->whereDate('created_at', now())
@@ -121,6 +128,7 @@ class DailyStockCheckController extends Controller
         return view('daily-stock-checks.create', [
             'products' => $products,
             'checkType' => $type,
+            'bagAverages' => $bagAverages,
             'title' => ucfirst($type) . ' Stock Check',
             'subtitle' => 'Record physical inventory count'
         ]);
@@ -250,5 +258,29 @@ class DailyStockCheckController extends Controller
             
         return redirect()->route('daily-stock-checks.index')
             ->with('success', 'Stock checks for ' . $date . ' deleted successfully.');
+    }
+    
+    /**
+     * Get the latest bag averages for a collection of products
+     * 
+     * @param \Illuminate\Database\Eloquent\Collection $products
+     * @return array
+     */
+    private function getLatestBagAveragesForProducts($products)
+    {
+        $shopId = session('current_shop_id');
+        $bagAverages = [];
+        
+        foreach ($products as $product) {
+            // Get the latest stock-in record for this product
+            $latestStockIn = \App\Models\StockIn::where('shop_id', $shopId)
+                ->where('product_id', $product->id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+                
+            $bagAverages[$product->id] = $latestStockIn ? $latestStockIn->getActualBagWeight() : $product->avg_bag_weight;
+        }
+        
+        return $bagAverages;
     }
 }

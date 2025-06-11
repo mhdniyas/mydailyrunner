@@ -101,6 +101,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/financial', [ReportController::class, 'financial'])->name('financial');
             Route::get('/customer-dues', [ReportController::class, 'customerDues'])->name('customer-dues');
             Route::get('/bag-weights', [ReportController::class, 'bagWeights'])->name('bag-weights');
+            Route::get('/category-discrepancies', [ReportController::class, 'categoryDiscrepancies'])->name('category-discrepancies');
             
             // Export routes
             Route::get('/export/{type}', [ReportController::class, 'export'])->name('export');
@@ -113,6 +114,9 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/customer-dues', [ExportController::class, 'customerDuesReport'])->name('customer-dues');
             Route::get('/pdf/{type}', [ExportController::class, 'exportPdf'])->name('pdf');
         });
+        
+        // Product category management
+        Route::resource('product-categories', App\Http\Controllers\ProductCategoryController::class);
     });
     
     // User & Role Management (Owner only)
