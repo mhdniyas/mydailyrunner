@@ -12,6 +12,15 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
+        // Get category IDs
+        $riceCategory = \App\Models\ProductCategory::where('name', 'Rice Products')->first();
+        $wheatCategory = \App\Models\ProductCategory::where('name', 'Wheat Products')->first();
+        $sugarCategory = \App\Models\ProductCategory::where('name', 'Sugar Products')->first();
+
+        if (!$riceCategory || !$wheatCategory || !$sugarCategory) {
+            throw new \Exception('Please run ProductCategorySeeder first!');
+        }
+
         $products = [
             [
                 'name' => 'Boiled Rice',
@@ -20,6 +29,7 @@ class ProductSeeder extends Seeder
                 'current_stock' => 0,
                 'min_stock_level' => 200,
                 'description' => 'Premium quality boiled rice (BR)',
+                'category_id' => $riceCategory->id,
             ],
             [
                 'name' => 'Raw Rice',
@@ -28,6 +38,7 @@ class ProductSeeder extends Seeder
                 'current_stock' => 0,
                 'min_stock_level' => 200,
                 'description' => 'Fresh raw rice (RR)',
+                'category_id' => $riceCategory->id,
             ],
             [
                 'name' => 'Custom Milled Rice',
@@ -36,6 +47,7 @@ class ProductSeeder extends Seeder
                 'current_stock' => 0,
                 'min_stock_level' => 200,
                 'description' => 'Specially milled rice (CMR)',
+                'category_id' => $riceCategory->id,
             ],
             [
                 'name' => 'Wheat',
@@ -44,6 +56,7 @@ class ProductSeeder extends Seeder
                 'current_stock' => 0,
                 'min_stock_level' => 200,
                 'description' => 'High quality wheat',
+                'category_id' => $wheatCategory->id,
             ],
             [
                 'name' => 'Atta',
@@ -52,6 +65,7 @@ class ProductSeeder extends Seeder
                 'current_stock' => 0,
                 'min_stock_level' => 200,
                 'description' => 'Wheat flour (Atta)',
+                'category_id' => $wheatCategory->id,
             ],
             [
                 'name' => 'Sugar',
@@ -60,6 +74,7 @@ class ProductSeeder extends Seeder
                 'current_stock' => 0,
                 'min_stock_level' => 200,
                 'description' => 'Pure white sugar',
+                'category_id' => $sugarCategory->id,
             ],
         ];
 
@@ -73,6 +88,7 @@ class ProductSeeder extends Seeder
                 'current_stock' => $productData['current_stock'],
                 'min_stock_level' => $productData['min_stock_level'],
                 'description' => $productData['description'],
+                'category_id' => $productData['category_id'],
             ]);
         }
     }

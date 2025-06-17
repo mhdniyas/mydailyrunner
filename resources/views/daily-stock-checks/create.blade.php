@@ -48,7 +48,7 @@
             </div>
         @else
             <!-- Stock Check Form -->
-            <form action="{{ route('daily-stock-checks.store') }}" method="POST" class="space-y-6">
+            <form action="{{ route('daily-stock-checks.store') }}" method="POST" class="space-y-6" id="stockCheckForm">
                 @csrf
                 <input type="hidden" name="check_type" value="{{ $checkType }}">
                 
@@ -99,8 +99,8 @@
                                         <div class="flex items-center space-x-2">
                                             <input type="number" name="physical_stock[{{ $index }}]" value="{{ old('physical_stock.' . $index, $product->current_stock) }}" 
                                                    step="0.01" min="0" class="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-accent-500 focus:border-accent-500 transition-all duration-200" 
-                                                   id="physical_stock_{{ $index }}" required>
-                                            <button type="button" onclick="openBagCalculator({{ $index }}, '{{ $product->name }}', '{{ $product->unit }}')" 
+                                                   id="physical_stock_mobile_{{ $index }}" required>
+                                            <button type="button" onclick="openBagCalculator({{ $index }}, '{{ $product->name }}', '{{ $product->unit }}', 'mobile')" 
                                                     class="bg-primary-600 hover:bg-primary-700 text-white px-3 py-2 rounded-md text-sm whitespace-nowrap transition-colors">
                                                 <i class="fas fa-calculator mr-1"></i>Calc
                                             </button>
@@ -151,8 +151,8 @@
                                                     <div class="flex items-center space-x-2">
                                                         <input type="number" name="physical_stock[{{ $index }}]" value="{{ old('physical_stock.' . $index, $product->current_stock) }}" 
                                                                step="0.01" min="0" class="border-gray-300 rounded-md shadow-sm focus:ring-accent-500 focus:border-accent-500 flex-1 w-24 transition-all duration-200" 
-                                                               id="physical_stock_{{ $index }}" required>
-                                                        <button type="button" onclick="openBagCalculator({{ $index }}, '{{ $product->name }}', '{{ $product->unit }}')" 
+                                                               id="physical_stock_desktop_{{ $index }}" required>
+                                                        <button type="button" onclick="openBagCalculator({{ $index }}, '{{ $product->name }}', '{{ $product->unit }}', 'desktop')" 
                                                                 class="bg-primary-600 hover:bg-primary-700 text-white px-3 py-1 rounded text-sm whitespace-nowrap transition-colors" title="Bag Calculator">
                                                             <i class="fas fa-calculator"></i>
                                                         </button>
@@ -275,6 +275,11 @@
                     <i class="fas fa-check mr-2"></i>Apply to Stock
                 </button>
             </div>
+            <!-- Success notification for calculator -->
+            <div id="calculatorNotification" class="fixed bottom-4 right-4 bg-green-500 text-white p-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span>Value applied successfully!</span>
+            </div>
         </div>
     </div>
 
@@ -341,16 +346,20 @@
     </style>
 
     <script>
+        // Global variables for the bag calculator
         let currentProductIndex = null;
         let calculationCounter = 0;
         let currentProductId = null;
         let currentProductBagAvg = 0;
         let currentProductUnit = '';
+        let currentViewType = 'desktop'; // Default view type
         
-        function openBagCalculator(productIndex, productName, unit) {
+        // Function to open the bag calculator modal
+        function openBagCalculator(productIndex, productName, unit, viewType = 'desktop') {
             currentProductIndex = productIndex;
             currentProductId = document.querySelector(`input[name="product_id[${productIndex}]"]`).value;
             currentProductUnit = unit;
+            currentViewType = viewType; // Store the view type (mobile or desktop)
             
             // Get the bag average for this product from the StockIn model data
             currentProductBagAvg = parseFloat(document.getElementById(`product_${currentProductId}_avg_bag_weight`)?.value || 0);
@@ -381,6 +390,7 @@
             }, 300);
         }
 
+        // Function to close the bag calculator modal
         function closeBagCalculator() {
             const modal = document.getElementById('bagCalculatorModal');
             modal.classList.add('hidden');
@@ -388,6 +398,7 @@
             currentProductIndex = null;
         }
 
+        // Function to add a new calculation row
         function addCalculationRow() {
             calculationCounter++;
             const rowId = `calc_row_${calculationCounter}`;
@@ -458,6 +469,7 @@
             updateGrandTotal();
         }
 
+        // Function to remove a calculation row
         function removeCalculationRow(rowId) {
             const row = document.getElementById(rowId);
             if (row) {
@@ -470,6 +482,7 @@
             }
         }
 
+        // Function to calculate values for a specific row
         function calculateRow(rowId) {
             const row = document.getElementById(rowId);
             const inputs = row.querySelectorAll('.calc-input');
@@ -503,6 +516,7 @@
             updateGrandTotal();
         }
 
+        // Function to update the grand total
         function updateGrandTotal() {
             const results = document.querySelectorAll('.row-result');
             let total = 0;
@@ -545,13 +559,33 @@
             }
         }
 
+        // Function to apply calculated value to stock input
         function applyToStock() {
             const total = parseFloat(document.getElementById('grandTotal').textContent) || 0;
             
             if (currentProductIndex !== null) {
-                const physicalStockInput = document.getElementById(`physical_stock_${currentProductIndex}`);
+                // Get the appropriate input field based on the view type
+                const inputId = `physical_stock_${currentViewType}_${currentProductIndex}`;
+                const physicalStockInput = document.getElementById(inputId);
+                
                 if (physicalStockInput) {
+                    // Properly update the input value to ensure it's submitted with the form
                     physicalStockInput.value = total.toFixed(2);
+                    
+                    // Store the value in a data attribute to ensure it persists
+                    physicalStockInput.setAttribute('data-calculated-value', total.toFixed(2));
+                    
+                    // Also update the corresponding input in the other view if it exists
+                    const otherViewType = currentViewType === 'mobile' ? 'desktop' : 'mobile';
+                    const otherInput = document.getElementById(`physical_stock_${otherViewType}_${currentProductIndex}`);
+                    if (otherInput) {
+                        otherInput.value = total.toFixed(2);
+                        otherInput.setAttribute('data-calculated-value', total.toFixed(2));
+                    }
+                    
+                    // Trigger an input event to ensure any event listeners know the value has changed
+                    const inputEvent = new Event('input', { bubbles: true });
+                    physicalStockInput.dispatchEvent(inputEvent);
                     
                     // Add animation to the updated input
                     physicalStockInput.style.transform = 'scale(1.1)';
@@ -560,33 +594,101 @@
                         physicalStockInput.style.transform = 'scale(1)';
                         physicalStockInput.style.backgroundColor = '';
                     }, 500);
+                    
+                    // Show success notification
+                    const notification = document.getElementById('calculatorNotification');
+                    notification.style.transform = 'translate(0)';
+                    notification.style.opacity = '1';
+                    
+                    // Hide notification after 3 seconds
+                    setTimeout(() => {
+                        notification.style.transform = 'translateY(20px)';
+                        notification.style.opacity = '0';
+                    }, 3000);
+                    
+                    // Log to console for debugging
+                    console.log('Stock value updated:', {
+                        product_index: currentProductIndex,
+                        view_type: currentViewType,
+                        input_id: inputId,
+                        new_value: total.toFixed(2)
+                    });
+                } else {
+                    console.error(`Input with ID ${inputId} not found`);
                 }
             }
             
             closeBagCalculator();
         }
 
-        // Close modal when clicking outside (only on desktop)
-        document.getElementById('bagCalculatorModal').addEventListener('click', function(event) {
-            if (event.target === this && window.innerWidth >= 640) {
-                closeBagCalculator();
-            }
-        });
-
-        // Handle escape key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape' && !document.getElementById('bagCalculatorModal').classList.contains('hidden')) {
-                closeBagCalculator();
-            }
-        });
-
-        // Initialize animations on page load
+        // Event listeners setup
         document.addEventListener('DOMContentLoaded', function() {
+            // Modal close events
+            document.getElementById('bagCalculatorModal').addEventListener('click', function(event) {
+                if (event.target === this && window.innerWidth >= 640) {
+                    closeBagCalculator();
+                }
+            });
+
+            // Handle escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && !document.getElementById('bagCalculatorModal').classList.contains('hidden')) {
+                    closeBagCalculator();
+                }
+            });
+            
             // Add entrance animations to existing elements
             const elements = document.querySelectorAll('.animate-fade-in');
             elements.forEach((el, index) => {
                 el.style.animationDelay = `${index * 0.1}s`;
             });
+            
+            // Ensure form submission captures all updated values
+            const stockCheckForm = document.getElementById('stockCheckForm');
+            if (stockCheckForm) {
+                stockCheckForm.addEventListener('submit', function(event) {
+                    // Prevent the default form submission to allow our modifications
+                    event.preventDefault();
+                    
+                    // Keep track of processed field names to avoid duplicates
+                    const processedFieldNames = new Set();
+                    
+                    // Process physical stock inputs (both mobile and desktop)
+                    document.querySelectorAll('input[name^="physical_stock"]').forEach(input => {
+                        // Skip if we've already processed an input with this name
+                        if (processedFieldNames.has(input.name)) {
+                            return;
+                        }
+                        
+                        // Mark this field as processed
+                        processedFieldNames.add(input.name);
+                        
+                        // Check if there's a stored calculated value and use it
+                        const calculatedValue = input.getAttribute('data-calculated-value');
+                        if (calculatedValue) {
+                            // Use the calculated value from the bag calculator
+                            input.value = calculatedValue;
+                            console.log(`Using calculated value for ${input.name}: ${calculatedValue}`);
+                        } else {
+                            // Use the current input value
+                            console.log(`Using manual value for ${input.name}: ${input.value}`);
+                        }
+                        
+                        // Create a single hidden field to ensure the value gets submitted
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = input.name;
+                        hiddenInput.value = input.value;
+                        stockCheckForm.appendChild(hiddenInput);
+                    });
+                    
+                    // Add a small delay to ensure all values are set properly before submitting
+                    setTimeout(() => {
+                        console.log("Form is being submitted with updated values");
+                        stockCheckForm.submit();
+                    }, 100);
+                });
+            }
         });
     </script>
 </x-app-layout>

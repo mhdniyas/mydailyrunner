@@ -129,6 +129,19 @@
                             </div>
                         </div>
                         
+                        <!-- Product items -->
+                        <div class="mb-3 bg-gray-50 p-2 rounded-md">
+                            <p class="text-xs font-medium text-gray-500 mb-1">Products:</p>
+                            <div class="max-h-24 overflow-y-auto">
+                                @foreach($sale->items as $item)
+                                    <div class="text-sm py-1 border-b border-gray-100 last:border-b-0">
+                                        <span class="font-medium text-gray-900">{{ $item->product->name }}</span>
+                                        <span class="text-xs text-gray-600 ml-1">({{ $item->quantity }} x ₹{{ number_format($item->price, 2) }})</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        
                         <div class="grid grid-cols-3 gap-3 text-sm mb-3">
                             <div>
                                 <p class="text-gray-500">Total:</p>
@@ -178,6 +191,7 @@
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sale #</th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paid</th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due</th>
@@ -201,6 +215,16 @@
                                         </td>
                                         <td class="px-4 py-3 whitespace-nowrap">
                                             <div class="font-medium text-gray-900">{{ $sale->customer->name }}</div>
+                                        </td>
+                                        <
+                                            <div class="max-h-20 overflow-y-auto">
+                                                @foreach($sale->items as $item)
+                                                    <div class="mb-1 last:mb-0">
+                                                        <span class="font-medium text-gray-900">{{ $item->product->name }}</span>
+                                                        <span class="text-xs text-gray-500">({{ $item->quantity }} x ₹{{ number_format($item->price, 2) }})</span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
                                         </td>
                                         <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-primary-600">
                                             ₹{{ number_format($sale->total_amount, 2) }}
@@ -252,7 +276,7 @@
                                 @endforeach
                                 <!-- Summary Row -->
                                 <tr class="bg-gray-50 font-semibold border-t-2 border-gray-300">
-                                    <td class="px-4 py-3 whitespace-nowrap text-sm" colspan="3">
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm" colspan="4">
                                         Total ({{ $sales->count() }} sales on this page)
                                     </td>
                                     <td class="px-4 py-3 whitespace-nowrap text-sm text-primary-600">
@@ -396,6 +420,37 @@
 
         .text-red-600 {
             color: #dc2626;
+        }
+
+        /* Product list styling */
+        .max-h-20 {
+            max-height: 5rem;
+        }
+
+        .max-h-24 {
+            max-height: 6rem;
+        }
+
+        .overflow-y-auto {
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
     </style>
 </x-app-layout>
