@@ -271,7 +271,7 @@
                         
                         <!-- Sales & Customers Dropdown -->
                         <div class="dropdown-section">
-                            <button class="dropdown-button flex items-center justify-between w-full px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 nav-item ripple {{ request()->routeIs('sales.*') || request()->routeIs('customer-payments.*') || request()->routeIs('customers.*') ? 'bg-accent-600 text-white nav-active' : '' }}">
+                            <button class="dropdown-button flex items-center justify-between w-full px-4 py-3 text-primary-200 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 nav-item ripple {{ request()->routeIs('sales.*') || request()->routeIs('daily-sales.*') || request()->routeIs('customer-payments.*') || request()->routeIs('customers.*') ? 'bg-accent-600 text-white nav-active' : '' }}">
                                 <div class="flex items-center">
                                     <i class="fas fa-cash-register mr-3"></i>
                                     <span class="menu-appear" style="animation-delay: 0.15s">Sales & Customers</span>
@@ -283,6 +283,11 @@
                                    class="flex items-center px-4 py-2 mt-1 text-primary-300 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('sales.*') ? 'bg-primary-700 text-white' : '' }}">
                                     <i class="fas fa-receipt mr-3 text-xs"></i>
                                     <span>Sales</span>
+                                </a>
+                                <a href="{{ route('daily-sales.index') }}" 
+                                   class="flex items-center px-4 py-2 text-primary-300 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('daily-sales.*') ? 'bg-primary-700 text-white' : '' }}">
+                                    <i class="fas fa-chart-line mr-3 text-xs"></i>
+                                    <span>Daily Sales</span>
                                 </a>
                                 <a href="{{ route('customer-payments.index') }}" 
                                    class="flex items-center px-4 py-2 text-primary-300 rounded-lg hover:bg-primary-800 hover:text-white transition-colors duration-200 {{ request()->routeIs('customer-payments.*') ? 'bg-primary-700 text-white' : '' }}">

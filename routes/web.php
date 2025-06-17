@@ -7,6 +7,7 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\StockInController;
 use App\Http\Controllers\DailyStockCheckController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\DailySalesController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerPaymentController;
 use App\Http\Controllers\FinancialEntryController;
@@ -75,6 +76,9 @@ Route::middleware(['auth'])->group(function () {
         
         // Sales routes
         Route::resource('sales', SaleController::class);
+        
+        // Daily Sales routes
+        Route::get('daily-sales', [DailySalesController::class, 'index'])->name('daily-sales.index');
         
         // Customer Payment routes
         Route::get('/customer-payments', [CustomerPaymentController::class, 'index'])->name('customer-payments.index');

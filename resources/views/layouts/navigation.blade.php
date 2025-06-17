@@ -15,6 +15,13 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+
+                    <x-nav-link :href="route('daily-sales.index')" :active="request()->routeIs('daily-sales.index')">
+                        <div class="flex items-center">
+                            <i class="fas fa-chart-line mr-2"></i>
+                            {{ __('Daily Sales') }}
+                        </div>
+                    </x-nav-link>
                     
                     <x-nav-link :href="route('subscription.status')" :active="request()->routeIs('subscription.*')">
                         <div class="flex items-center">
@@ -99,6 +106,13 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
+            </x-responsive-nav-link>
+            
+            <x-responsive-nav-link :href="route('daily-sales.index')" :active="request()->routeIs('daily-sales.index')">
+                <div class="flex items-center">
+                    <i class="fas fa-chart-line mr-2"></i>
+                    {{ __('Daily Sales') }}
+                </div>
             </x-responsive-nav-link>
             
             <x-responsive-nav-link :href="route('subscription.status')" :active="request()->routeIs('subscription.*')">
