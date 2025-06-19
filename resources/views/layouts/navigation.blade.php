@@ -52,6 +52,8 @@
                         </div>
                     </x-nav-link>
                     @endif
+                    
+
                 </div>
             </div>
 
@@ -144,6 +146,8 @@
                 </div>
             </x-responsive-nav-link>
             @endif
+
+
         </div>
 
         <!-- Responsive Settings Options -->

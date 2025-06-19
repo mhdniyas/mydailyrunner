@@ -17,6 +17,8 @@ class Kernel extends ConsoleKernel
         
         // Send payment reminders weekly on Monday at 9 AM
         $schedule->command('app:send-payment-reminders')->weekly()->mondays()->at('09:00');
+
+
     }
 
     /**
