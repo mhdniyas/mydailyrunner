@@ -101,8 +101,8 @@
                         ₹{{ number_format($cashIn, 2) }}
                     </p>
                     <div class="mt-2 flex items-center text-xs text-green-600">
-                        <i class="fas fa-plus-circle mr-1"></i>
-                        <span>Inflow</span>
+                        <i class="fas fa-calendar-alt mr-1"></i>
+                        <span>This Month</span>
                     </div>
                 </div>
             </div>
@@ -112,40 +112,46 @@
         <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-green-200/20 to-green-400/30 rounded-bl-full transform translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-500"></div>
     </div>
     
-    <!-- Cash Out Card -->
-    <div class="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 overflow-hidden">
+    <!-- NEW: Daily Workflow Card -->
+    <div class="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-indigo-100 overflow-hidden">
         <!-- Background Gradient -->
-        <div class="absolute inset-0 bg-gradient-to-br from-red-50/50 to-pink-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         
         <!-- Shimmer Effect -->
         <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
         
+        <!-- "New" Badge -->
+        <div class="absolute top-2 right-2 bg-indigo-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md z-10 animate-pulse">
+            NEW
+        </div>
+        
         <div class="relative p-6">
             <div class="flex items-center space-x-4">
                 <div class="relative">
-                    <div class="p-4 rounded-2xl bg-gradient-to-br from-red-400 to-red-600 text-white shadow-lg shadow-red-200 group-hover:shadow-red-300 transition-shadow duration-300">
-                        <i class="fas fa-arrow-up text-2xl group-hover:animate-bounce transition-transform duration-300"></i>
+                    <div class="p-4 rounded-2xl bg-gradient-to-br from-indigo-400 to-purple-600 text-white shadow-lg shadow-indigo-200 group-hover:shadow-indigo-300 transition-shadow duration-300">
+                        <i class="fas fa-tasks text-2xl group-hover:scale-110 transition-transform duration-300"></i>
                     </div>
                     <!-- Pulse Ring -->
-                    <div class="absolute inset-0 rounded-2xl bg-red-400 opacity-20 group-hover:animate-ping"></div>
+                    <div class="absolute inset-0 rounded-2xl bg-indigo-400 opacity-20 group-hover:animate-ping"></div>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-gray-600 mb-1 group-hover:text-red-600 transition-colors duration-300">
-                        Cash Out
+                    <p class="text-sm font-medium text-gray-600 mb-1 group-hover:text-indigo-600 transition-colors duration-300">
+                        Daily Workflow
                     </p>
-                    <p class="text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-red-700 transition-colors duration-300 truncate">
-                        ₹{{ number_format($cashOut, 2) }}
+                    <p class="text-lg font-bold text-gray-900 group-hover:text-indigo-700 transition-colors duration-300 truncate">
+                        Start Your Day
                     </p>
-                    <div class="mt-2 flex items-center text-xs text-red-600">
-                        <i class="fas fa-minus-circle mr-1"></i>
-                        <span>Outflow</span>
-                    </div>
+                    <a href="{{ route('daily-workflow.index') }}" class="mt-2 inline-flex items-center text-xs text-indigo-600 hover:text-indigo-800 transition-colors">
+                        <i class="fas fa-play-circle mr-1"></i>
+                        <span>Begin Guided Process</span>
+                        <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                    </a>
                 </div>
             </div>
         </div>
         
         <!-- Corner Decoration -->
-        <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-red-200/20 to-red-400/30 rounded-bl-full transform translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-500"></div>
+        <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-indigo-200/20 to-purple-400/30 rounded-bl-full transform translate-x-8 -translate-y-8 group-hover:scale-125 transition-transform duration-500"></div>
     </div>
 </div>
 
@@ -359,6 +365,118 @@
             50% { transform: translateY(-3px); }
         }
     </style>
+</div>
+
+    <!-- Daily Workflow Quick Access Card -->
+    <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6 transform transition-all hover:shadow-lg">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Daily Workflow Shortcut</h3>
+                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800">
+                    New Feature
+                </span>
+            </div>
+            
+            <p class="text-sm text-gray-600 mb-4">
+                Streamline your daily operations with our new guided workflow process.
+            </p>
+            
+            <div class="flex flex-wrap gap-3">
+                <a href="{{ route('daily-workflow.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg class="mr-2 -ml-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Start Daily Workflow
+                </a>
+                
+                <a href="{{ route('daily-workflow.record-stock') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg class="mr-2 -ml-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    Quick Stock Entry
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Features Showcase -->
+<div class="bg-white rounded-2xl shadow-lg p-6 mb-6 overflow-hidden relative">
+    <!-- Decorative Elements -->
+    <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-200/20 to-purple-400/30 rounded-bl-full transform translate-x-8 -translate-y-8"></div>
+    <div class="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-blue-200/20 to-blue-400/30 rounded-tr-full transform -translate-x-8 translate-y-8"></div>
+
+    <!-- Section Header -->
+    <div class="relative">
+        <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-2 rounded-lg shadow-lg mr-3">
+                <i class="fas fa-star text-yellow-300"></i>
+            </div>
+            <span>New System Enhancements</span>
+            <div class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 animate-pulse">
+                Just Released
+            </div>
+        </h2>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+        <!-- Daily Workflow Feature -->
+        <div class="group bg-gradient-to-br from-white to-indigo-50 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-indigo-100 overflow-hidden">
+            <div class="h-24 bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center relative">
+                <div class="absolute inset-0 opacity-20 bg-pattern-circuit"></div>
+                <i class="fas fa-tasks text-4xl text-white"></i>
+                <div class="absolute top-2 right-2 bg-white text-indigo-600 text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+                    NEW
+                </div>
+            </div>
+            <div class="p-4">
+                <h3 class="font-semibold text-lg text-gray-900 mb-2">Daily Workflow Shortcut</h3>
+                <p class="text-sm text-gray-600 mb-3">Guided step-by-step process for daily shop operations. Simplifies your daily tasks with a structured approach.</p>
+                <a href="{{ route('daily-workflow.index') }}" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors">
+                    Try it now
+                    <i class="fas fa-arrow-right ml-1 group-hover:ml-2 transition-all duration-300"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Batch-based Stocking Feature -->
+        <div class="group bg-gradient-to-br from-white to-blue-50 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-blue-100 overflow-hidden">
+            <div class="h-24 bg-gradient-to-r from-blue-500 to-cyan-600 flex items-center justify-center relative">
+                <div class="absolute inset-0 opacity-20 bg-pattern-circuit"></div>
+                <i class="fas fa-boxes text-4xl text-white"></i>
+                <div class="absolute top-2 right-2 bg-white text-blue-600 text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+                    NEW
+                </div>
+            </div>
+            <div class="p-4">
+                <h3 class="font-semibold text-lg text-gray-900 mb-2">Batch-based Stocking</h3>
+                <p class="text-sm text-gray-600 mb-3">Track stock by batch with weighted average pricing. Improve inventory accuracy and cost calculations.</p>
+                <a href="{{ route('stock-ins.create') }}" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                    Add stock with batches
+                    <i class="fas fa-arrow-right ml-1 group-hover:ml-2 transition-all duration-300"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Subscription Management Feature -->
+        <div class="group bg-gradient-to-br from-white to-green-50 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 border border-green-100 overflow-hidden">
+            <div class="h-24 bg-gradient-to-r from-green-500 to-emerald-600 flex items-center justify-center relative">
+                <div class="absolute inset-0 opacity-20 bg-pattern-circuit"></div>
+                <i class="fas fa-crown text-4xl text-white"></i>
+                <div class="absolute top-2 right-2 bg-white text-green-600 text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+                    UPDATED
+                </div>
+            </div>
+            <div class="p-4">
+                <h3 class="font-semibold text-lg text-gray-900 mb-2">Enhanced Subscription</h3>
+                <p class="text-sm text-gray-600 mb-3">Improved subscription and access control with grace periods and expiration warnings.</p>
+                <a href="{{ route('subscription.status') }}" class="inline-flex items-center text-sm font-medium text-green-600 hover:text-green-800 transition-colors">
+                    Check your status
+                    <i class="fas fa-arrow-right ml-1 group-hover:ml-2 transition-all duration-300"></i>
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -39,7 +39,7 @@ class StockInController extends Controller
         return view('stock-ins.create', [
             'products' => $products,
             'title' => 'Add Stock',
-            'subtitle' => 'Record new inventory'
+            'subtitle' => 'Record new inventory with batch information'
         ]);
     }
 
@@ -58,6 +58,10 @@ class StockInController extends Controller
             'calculation_method' => 'required|in:formula_minus_half,formula_direct,manual',
             'manual_bag_weight' => 'nullable|numeric|min:0|required_if:calculation_method,manual',
             'notes' => 'nullable|string|max:255',
+            // New batch fields
+            'batch_date' => 'nullable|date',
+            'supplier' => 'nullable|string|max:255',
+            'expiry_date' => 'nullable|date|after_or_equal:batch_date',
         ]);
         
         // Calculate average bag weight based on method
@@ -80,6 +84,14 @@ class StockInController extends Controller
             'manual_bag_weight' => $validated['manual_bag_weight'] ?? null,
             'notes' => $validated['notes'] ?? null,
             'user_id' => Auth::id(),
+        ]);
+        
+        // Create batch record
+        $stockIn->createBatch([
+            'batch_date' => $validated['batch_date'] ?? now(),
+            'supplier' => $validated['supplier'] ?? null,
+            'expiry_date' => $validated['expiry_date'] ?? null,
+            'notes' => $validated['notes'] ?? null,
         ]);
         
         // Update product's average cost and bag weight

@@ -84,4 +84,33 @@ class StockIn extends Model
             default => 'Unknown'
         };
     }
+
+    /**
+     * Get the batch created from this stock in.
+     */
+    public function batch()
+    {
+        return $this->hasOne(StockBatch::class);
+    }
+    
+    /**
+     * Create a batch record from this stock in.
+     */
+    public function createBatch($additionalData = [])
+    {
+        return StockBatch::create([
+            'shop_id' => $this->shop_id,
+            'product_id' => $this->product_id,
+            'stock_in_id' => $this->id,
+            'user_id' => $this->user_id,
+            'batch_date' => $additionalData['batch_date'] ?? now(),
+            'quantity' => $this->quantity,
+            'bags' => $this->bags,
+            'bag_average' => $this->getActualBagWeight(),
+            'cost' => $this->cost,
+            'supplier' => $additionalData['supplier'] ?? null,
+            'expiry_date' => $additionalData['expiry_date'] ?? null,
+            'notes' => $additionalData['notes'] ?? $this->notes,
+        ]);
+    }
 }

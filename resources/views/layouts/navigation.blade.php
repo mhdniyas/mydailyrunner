@@ -23,13 +23,25 @@
                         </div>
                     </x-nav-link>
                     
+                    <x-nav-link :href="route('daily-workflow.index')" :active="request()->routeIs('daily-workflow.*')">
+                        <div class="flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            {{ __('Daily Workflow') }}
+                            <span class="ml-1.5 inline-flex items-center rounded-md bg-indigo-50 px-1.5 py-0.5 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-600/20">
+                                New
+                            </span>
+                        </div>
+                    </x-nav-link>
+                    
                     <x-nav-link :href="route('subscription.status')" :active="request()->routeIs('subscription.*')">
                         <div class="flex items-center">
-                            @if(Auth::user()->is_subscribed && Auth::user()->is_admin_approved)
+                            @if(Auth::user()->subscription_status === 'active')
                                 <svg class="w-4 h-4 mr-1 text-green-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                                 </svg>
-                            @elseif(Auth::user()->is_subscribed && !Auth::user()->is_admin_approved)
+                            @elseif(Auth::user()->subscription_status === 'pending')
                                 <svg class="w-4 h-4 mr-1 text-yellow-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                                 </svg>
@@ -117,13 +129,25 @@
                 </div>
             </x-responsive-nav-link>
             
+            <x-responsive-nav-link :href="route('daily-workflow.index')" :active="request()->routeIs('daily-workflow.*')">
+                <div class="flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    {{ __('Daily Workflow') }}
+                    <span class="ml-1.5 inline-flex items-center rounded-md bg-indigo-50 px-1.5 py-0.5 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-600/20">
+                        New
+                    </span>
+                </div>
+            </x-responsive-nav-link>
+            
             <x-responsive-nav-link :href="route('subscription.status')" :active="request()->routeIs('subscription.*')">
                 <div class="flex items-center">
-                    @if(Auth::user()->is_subscribed && Auth::user()->is_admin_approved)
+                    @if(Auth::user()->subscription_status === 'active')
                         <svg class="w-4 h-4 mr-1 text-green-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
-                    @elseif(Auth::user()->is_subscribed && !Auth::user()->is_admin_approved)
+                    @elseif(Auth::user()->subscription_status === 'pending')
                         <svg class="w-4 h-4 mr-1 text-yellow-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                         </svg>

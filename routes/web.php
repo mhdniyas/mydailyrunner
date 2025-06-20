@@ -121,6 +121,16 @@ Route::middleware(['auth'])->group(function () {
         
         // Product category management
         Route::resource('product-categories', App\Http\Controllers\ProductCategoryController::class);
+        
+        // Daily Workflow Shortcut routes
+        Route::prefix('daily-workflow')->name('daily-workflow.')->group(function () {
+            Route::get('/', [App\Http\Controllers\DailyWorkflowController::class, 'index'])->name('index');
+            Route::get('/record-stock', [App\Http\Controllers\DailyWorkflowController::class, 'recordStock'])->name('record-stock');
+            Route::post('/store-stock', [App\Http\Controllers\DailyWorkflowController::class, 'storeStock'])->name('store-stock');
+            Route::get('/discrepancy', [App\Http\Controllers\DailyWorkflowController::class, 'discrepancy'])->name('discrepancy');
+            Route::post('/store-discrepancy', [App\Http\Controllers\DailyWorkflowController::class, 'storeDiscrepancy'])->name('store-discrepancy');
+            Route::get('/complete', [App\Http\Controllers\DailyWorkflowController::class, 'complete'])->name('complete');
+        });
     });
     
     // User & Role Management (Owner only)

@@ -23,8 +23,9 @@ class User extends Authenticatable
         'password',
         'invitation_token',
         'last_login_at',
-        'is_subscribed',
-        'is_admin_approved',
+        'subscription_status',
+        'subscription_expires_at',
+        'subscription_notes',
     ];
 
     /**
@@ -46,8 +47,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'last_login_at' => 'datetime',
-        'is_subscribed' => 'boolean',
-        'is_admin_approved' => 'boolean',
+        'subscription_expires_at' => 'date',
     ];
 
     /**
@@ -159,5 +159,66 @@ class User extends Authenticatable
     {
         // Only users with admin role can approve subscriptions
         return $this->isAdmin();
+    }
+
+    /**
+     * Check if user has an active subscription.
+     * 
+     * @return bool
+     */
+    public function hasActiveSubscription()
+    {
+        return $this->subscription_status === 'active' && 
+               ($this->subscription_expires_at === null || $this->subscription_expires_at >= now());
+    }
+
+    /**
+     * Check if user is in grace period.
+     * 
+     * @return bool
+     */
+    public function isInGracePeriod()
+    {
+        return $this->subscription_status === 'grace_period';
+    }
+
+    /**
+     * Check if user's subscription has expired.
+     * 
+     * @return bool
+     */
+    public function hasExpiredSubscription()
+    {
+        return $this->subscription_status === 'expired' || 
+               ($this->subscription_status === 'active' && $this->subscription_expires_at !== null && $this->subscription_expires_at < now());
+    }
+
+    /**
+     * Get days remaining in subscription.
+     * 
+     * @return int|null
+     */
+    public function daysRemainingInSubscription()
+    {
+        if ($this->subscription_expires_at === null) {
+            return null; // Unlimited subscription
+        }
+        
+        return max(0, now()->diffInDays($this->subscription_expires_at, false));
+    }
+
+    /**
+     * Check if user needs to be warned about expiring subscription.
+     * 
+     * @return bool
+     */
+    public function needsExpirationWarning()
+    {
+        if ($this->subscription_expires_at === null) {
+            return false;
+        }
+        
+        $daysRemaining = $this->daysRemainingInSubscription();
+        return $this->subscription_status === 'active' && $daysRemaining !== null && $daysRemaining <= 7;
     }
 }

@@ -50,7 +50,7 @@
                                 <i class="fas fa-hourglass-half mr-2"></i>
                                 Pending Approvals
                                 @php
-                                    $pendingCount = \App\Models\User::where('is_subscribed', true)->where('is_admin_approved', false)->count();
+                                    $pendingCount = \App\Models\User::where('subscription_status', 'pending')->count();
                                 @endphp
                                 @if($pendingCount > 0)
                                     <span class="ml-2 px-2 py-0.5 text-xs rounded-full bg-white text-indigo-600 animate-pulse">{{ $pendingCount }}</span>
@@ -64,7 +64,7 @@
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <p class="text-xs text-green-600 font-medium">Active</p>
-                                        <p class="text-2xl font-bold text-green-800">{{ $users->where('is_subscribed', true)->where('is_admin_approved', true)->count() }}</p>
+                                        <p class="text-2xl font-bold text-green-800">{{ $users->where('subscription_status', 'active')->count() }}</p>
                                     </div>
                                     <div class="bg-green-100 p-2 rounded-full">
                                         <i class="fas fa-check-circle text-green-600"></i>
@@ -75,7 +75,7 @@
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <p class="text-xs text-yellow-600 font-medium">Pending</p>
-                                        <p class="text-2xl font-bold text-yellow-800">{{ $users->where('is_subscribed', true)->where('is_admin_approved', false)->count() }}</p>
+                                        <p class="text-2xl font-bold text-yellow-800">{{ $users->where('subscription_status', 'pending')->count() }}</p>
                                     </div>
                                     <div class="bg-yellow-100 p-2 rounded-full">
                                         <i class="fas fa-clock text-yellow-600"></i>
@@ -86,7 +86,9 @@
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <p class="text-xs text-gray-600 font-medium">Free Users</p>
-                                        <p class="text-2xl font-bold text-gray-800">{{ $users->where('is_subscribed', false)->count() }}</p>
+                                        <p class="text-2xl font-bold text-gray-800">{{ $users->filter(function($user) { 
+                                                return $user->subscription_status === 'expired' || $user->subscription_status === null; 
+                                            })->count() }}</p>
                                     </div>
                                     <div class="bg-gray-100 p-2 rounded-full">
                                         <i class="fas fa-user text-gray-600"></i>
@@ -114,7 +116,7 @@
                                 <i class="fas fa-crown mr-2"></i>
                                 Active Premium Subscriptions
                                 <span class="ml-3 text-sm bg-green-200 text-green-800 px-3 py-1 rounded-full">
-                                    {{ $users->where('is_subscribed', true)->where('is_admin_approved', true)->count() }} Active
+                                    {{ $users->where('subscription_status', 'active')->count() }} Active
                                 </span>
                             </h4>
                             <p class="text-sm text-green-700">Users with full premium access and approved subscriptions</p>
@@ -124,7 +126,7 @@
                         <div class="lg:hidden space-y-3">
                             @php $hasApprovedUsers = false; @endphp
                             @foreach($users as $user)
-                                @if($user->is_subscribed && $user->is_admin_approved)
+                                @if($user->subscription_status === 'active')
                                     @php $hasApprovedUsers = true; @endphp
                                     <div class="bg-white border border-green-200 rounded-lg p-4 shadow-sm transition-all duration-300 hover:shadow-md">
                                         <div class="flex justify-between items-start mb-3">
@@ -178,7 +180,7 @@
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     @php $hasApprovedUsers = false; @endphp
                                     @foreach($users as $user)
-                                        @if($user->is_subscribed && $user->is_admin_approved)
+                                        @if($user->subscription_status === 'active')
                                             @php $hasApprovedUsers = true; @endphp
                                             <tr class="hover:bg-gray-50 transition-colors">
                                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -238,7 +240,7 @@
                                 <i class="fas fa-hourglass-half mr-2 animate-pulse"></i>
                                 Pending Subscription Approvals
                                 <span class="ml-3 text-sm bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full animate-pulse">
-                                    {{ $users->where('is_subscribed', true)->where('is_admin_approved', false)->count() }} Pending
+                                    {{ $users->where('subscription_status', 'pending')->count() }} Pending
                                 </span>
                             </h4>
                             <p class="text-sm text-yellow-700">Subscription requests awaiting admin approval</p>
@@ -248,7 +250,7 @@
                         <div class="lg:hidden space-y-3">
                             @php $hasPendingUsers = false; @endphp
                             @foreach($users as $user)
-                                @if($user->is_subscribed && !$user->is_admin_approved)
+                                @if($user->subscription_status === 'pending')
                                     @php $hasPendingUsers = true; @endphp
                                     <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 shadow-sm transition-all duration-300 hover:shadow-md">
                                         <div class="flex justify-between items-start mb-3">
@@ -310,7 +312,7 @@
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     @php $hasPendingUsers = false; @endphp
                                     @foreach($users as $user)
-                                        @if($user->is_subscribed && !$user->is_admin_approved)
+                                        @if($user->subscription_status === 'pending')
                                             @php $hasPendingUsers = true; @endphp
                                             <tr class="bg-yellow-50 hover:bg-yellow-100 transition-colors">
                                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -379,7 +381,9 @@
                                 <i class="fas fa-users mr-2"></i>
                                 Free Account Users
                                 <span class="ml-3 text-sm bg-gray-200 text-gray-800 px-3 py-1 rounded-full">
-                                    {{ $users->where('is_subscribed', false)->count() }} Users
+                                    {{ $users->filter(function($user) { 
+                                            return $user->subscription_status === 'expired' || $user->subscription_status === null; 
+                                        })->count() }} Users
                                 </span>
                             </h4>
                             <p class="text-sm text-gray-700">Users with basic free accounts</p>
@@ -389,7 +393,7 @@
                         <div class="lg:hidden space-y-3">
                             @php $hasNotSubscribedUsers = false; @endphp
                             @foreach($users as $user)
-                                @if(!$user->is_subscribed)
+                                @if($user->subscription_status === 'expired' || $user->subscription_status === null)
                                     @php $hasNotSubscribedUsers = true; @endphp
                                     <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm transition-all duration-300 hover:shadow-md">
                                         <div class="flex justify-between items-start mb-3">
@@ -442,7 +446,7 @@
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     @php $hasNotSubscribedUsers = false; @endphp
                                     @foreach($users as $user)
-                                        @if(!$user->is_subscribed)
+                                        @if($user->subscription_status === 'expired' || $user->subscription_status === null)
                                             @php $hasNotSubscribedUsers = true; @endphp
                                             <tr class="hover:bg-gray-50 transition-colors">
                                                 <td class="px-6 py-4 whitespace-nowrap">

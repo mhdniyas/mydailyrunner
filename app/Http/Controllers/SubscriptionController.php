@@ -39,10 +39,10 @@ class SubscriptionController extends Controller
     {
         $user = Auth::user();
         
-        // Redirect if already subscribed
-        if ($user->is_subscribed) {
+        // Redirect if already has a subscription or pending request
+        if (in_array($user->subscription_status, ['active', 'pending', 'grace_period'])) {
             return redirect()->route('subscription.status')
-                ->with('info', 'You already have an active subscription request.');
+                ->with('info', 'You already have an active subscription or pending request.');
         }
         
         return view('subscription.request', compact('user'));
@@ -59,8 +59,8 @@ class SubscriptionController extends Controller
         $user = Auth::user();
         
         // Update user subscription status
-        $user->is_subscribed = true;
-        $user->is_admin_approved = false;
+        $user->subscription_status = 'pending';
+        $user->subscription_notes = $request->input('notes');
         $user->save();
         
         // Log the subscription request
@@ -88,12 +88,12 @@ class SubscriptionController extends Controller
     {
         $user = Auth::user();
         
-        // Was the subscription approved before cancelling?
-        $wasApproved = $user->is_admin_approved;
+        // Store the previous status for notifications
+        $previousStatus = $user->subscription_status;
         
         // Cancel subscription
-        $user->is_subscribed = false;
-        $user->is_admin_approved = false;
+        $user->subscription_status = 'expired';
+        $user->subscription_expires_at = now();
         $user->save();
         
         // Log the cancellation

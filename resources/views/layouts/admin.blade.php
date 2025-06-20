@@ -397,7 +397,7 @@
                                     <i class="fas fa-id-card mr-3 text-xs"></i>
                                     <span>Subscription Management</span>
                                     @php
-                                        $pendingCount = \App\Models\User::where('is_subscribed', true)->where('is_admin_approved', false)->count();
+                                        $pendingCount = \App\Models\User::where('subscription_status', 'pending')->count();
                                     @endphp
                                     @if($pendingCount > 0)
                                         <span class="ml-2 px-2 py-0.5 text-xs rounded-full bg-yellow-500 text-white animate-pulse">{{ $pendingCount }}</span>

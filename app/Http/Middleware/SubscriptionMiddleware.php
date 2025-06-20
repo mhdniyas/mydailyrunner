@@ -28,12 +28,41 @@ class SubscriptionMiddleware
             return $next($request);
         }
         
-        // Check if user has an active subscription and admin approval
-        if (!$user->is_subscribed || !$user->is_admin_approved) {
-            return redirect()->route('subscription.status')
-                ->with('warning', 'You need an active subscription to access this feature.');
+        // Auto-update expired status if needed
+        if ($user->subscription_status === 'active' && 
+            $user->subscription_expires_at !== null && 
+            $user->subscription_expires_at < now()) {
+            $user->subscription_status = 'expired';
+            $user->save();
         }
-
-        return $next($request);
+        
+        // Check subscription status
+        if ($user->subscription_status === 'active') {
+            // Show warning for expiring soon (7 days or less)
+            if ($user->needsExpirationWarning()) {
+                $daysLeft = $user->daysRemainingInSubscription();
+                $warningMessage = "Your subscription expires in {$daysLeft} " . 
+                                 ($daysLeft == 1 ? 'day' : 'days') . 
+                                 ". Please renew soon to avoid service interruption.";
+                
+                session()->flash('subscription_warning', $warningMessage);
+            }
+            
+            return $next($request);
+        } else if ($user->subscription_status === 'grace_period') {
+            // Allow access but with a warning
+            session()->flash('subscription_warning', 
+                'Your subscription has expired but you are in a grace period. ' .
+                'Please renew your subscription as soon as possible.');
+            
+            return $next($request);
+        } else if ($user->subscription_status === 'pending') {
+            return redirect()->route('subscription.status')
+                ->with('warning', 'Your subscription is pending approval. Please check back later.');
+        } else {
+            // Expired or other status - redirect to subscription page
+            return redirect()->route('subscription.status')
+                ->with('error', 'Your subscription has expired. Please renew to continue using the application.');
+        }
     }
 }

@@ -37,8 +37,7 @@ class AdminController extends Controller
      */
     public function subscriptions()
     {
-        $users = User::orderBy('is_subscribed', 'desc')
-            ->orderBy('is_admin_approved', 'desc')
+        $users = User::orderByRaw("FIELD(subscription_status, 'active', 'grace_period', 'pending', 'expired', NULL) ASC")
             ->paginate(20);
         
         return view('admin.subscriptions.index', compact('users'));
@@ -51,8 +50,7 @@ class AdminController extends Controller
      */
     public function pendingApprovals()
     {
-        $users = User::where('is_subscribed', true)
-            ->where('is_admin_approved', false)
+        $users = User::where('subscription_status', 'pending')
             ->paginate(20);
         
         return view('admin.subscriptions.pending', compact('users'));
@@ -73,7 +71,7 @@ class AdminController extends Controller
         }
         
         // Update user subscription status
-        $user->is_admin_approved = true;
+        $user->subscription_status = 'active';
         $user->save();
         
         // Log the approval
@@ -131,14 +129,12 @@ class AdminController extends Controller
         
         $action = '';
         
-        if ($user->is_subscribed) {
-            $user->is_subscribed = false;
-            $user->is_admin_approved = false;
+        if ($user->subscription_status === 'active') {
+            $user->subscription_status = 'expired';
             $status = 'cancelled';
             $action = 'cancelled';
         } else {
-            $user->is_subscribed = true;
-            $user->is_admin_approved = true;
+            $user->subscription_status = 'active';
             $status = 'approved';
             $action = 'activated';
         }

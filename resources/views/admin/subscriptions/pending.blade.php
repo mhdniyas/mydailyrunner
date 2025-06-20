@@ -275,11 +275,11 @@
                             <!-- Quick Stats for Empty State -->
                             <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-lg mx-auto">
                                 <div class="bg-blue-50 p-4 rounded-lg">
-                                    <div class="text-2xl font-bold text-blue-600">{{ \App\Models\User::where('is_subscribed', true)->where('is_admin_approved', true)->count() }}</div>
+                                    <div class="text-2xl font-bold text-blue-600">{{ \App\Models\User::where('subscription_status', 'active')->count() }}</div>
                                     <div class="text-sm text-blue-700">Active Subscriptions</div>
                                 </div>
                                 <div class="bg-gray-50 p-4 rounded-lg">
-                                    <div class="text-2xl font-bold text-gray-600">{{ \App\Models\User::where('is_subscribed', false)->count() }}</div>
+                                    <div class="text-2xl font-bold text-gray-600">{{ \App\Models\User::where('subscription_status', 'expired')->orWhereNull('subscription_status')->count() }}</div>
                                     <div class="text-sm text-gray-700">Free Users</div>
                                 </div>
                                 <div class="bg-green-50 p-4 rounded-lg">

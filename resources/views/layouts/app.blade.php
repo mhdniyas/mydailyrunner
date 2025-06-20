@@ -32,7 +32,21 @@
 
             <!-- Page Content -->
             <main>
-                {{ $slot }}
+                <div class="py-6">
+                    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            <!-- Sidebar (on medium screens and up) -->
+                            <div class="hidden md:block md:col-span-1">
+                                @include('layouts.sidebar')
+                            </div>
+                            
+                            <!-- Main Content -->
+                            <div class="md:col-span-3">
+                                {{ $slot }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </main>
         
         </div>

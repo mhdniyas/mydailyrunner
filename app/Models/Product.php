@@ -100,4 +100,53 @@ class Product extends Model
     {
         return $this->current_stock * $this->avg_cost;
     }
+
+    /**
+     * Get the batches for the product.
+     */
+    public function batches()
+    {
+        return $this->hasMany(StockBatch::class);
+    }
+    
+    /**
+     * Get latest batch for the product.
+     */
+    public function getLatestBatch()
+    {
+        return $this->batches()->latest('batch_date')->first();
+    }
+    
+    /**
+     * Get latest bag average from batches.
+     */
+    public function getLatestBagAverage()
+    {
+        $latestBatch = $this->getLatestBatch();
+        return $latestBatch ? $latestBatch->bag_average : $this->avg_bag_weight;
+    }
+    
+    /**
+     * Calculate weighted average bag weight from active batches.
+     */
+    public function calculateWeightedBagAverage()
+    {
+        $batches = $this->batches()->latest('batch_date')->take(5)->get();
+        
+        if ($batches->isEmpty()) {
+            return $this->avg_bag_weight;
+        }
+        
+        $totalBags = $batches->sum('bags');
+        
+        if ($totalBags == 0) {
+            return $this->avg_bag_weight;
+        }
+        
+        $weightedSum = $batches->sum(function($batch) {
+            return $batch->bags * $batch->bag_average;
+        });
+        
+        return $weightedSum / $totalBags;
+    }
 }

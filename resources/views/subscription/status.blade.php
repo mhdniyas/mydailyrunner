@@ -61,7 +61,7 @@
                             Current Subscription Status
                         </h3>
                         
-                        @if($user->is_subscribed && $user->is_admin_approved)
+                        @if($user->subscription_status === 'active')
                             <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-lg border-l-4 border-green-400 shadow-sm transition-all duration-300 hover:shadow-md">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0">
@@ -75,6 +75,48 @@
                                             <span class="ml-2 px-2 py-1 text-xs bg-green-200 text-green-800 rounded-full">ACTIVE</span>
                                         </h4>
                                         <p class="mt-1 text-sm text-green-700">You have full access to all premium features and capabilities.</p>
+                                        
+                                        @if($user->subscription_expires_at)
+                                            <div class="mt-3 flex items-center">
+                                                <div class="flex-shrink-0">
+                                                    <div class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-green-200">
+                                                        <i class="fas fa-calendar-alt text-sm text-green-700"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <p class="text-sm text-green-800">
+                                                        Subscription expires: <strong>{{ $user->subscription_expires_at->format('F j, Y') }}</strong>
+                                                    </p>
+                                                    <p class="text-xs text-green-700">
+                                                        {{ $user->daysRemainingInSubscription() }} days remaining
+                                                        
+                                                        @if($user->needsExpirationWarning())
+                                                            <span class="inline-flex items-center ml-2 px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                                                Expiring Soon
+                                                            </span>
+                                                        @endif
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="mt-3 flex items-center">
+                                                <div class="flex-shrink-0">
+                                                    <div class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-green-200">
+                                                        <i class="fas fa-infinity text-sm text-green-700"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <p class="text-sm text-green-800">
+                                                        <strong>Lifetime Subscription</strong>
+                                                    </p>
+                                                    <p class="text-xs text-green-700">
+                                                        Your subscription does not expire
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        @endif
+                                        
                                         <div class="mt-3 flex flex-wrap gap-2">
                                             <span class="inline-flex items-center px-2 py-1 text-xs bg-green-200 text-green-800 rounded-full">
                                                 <i class="fas fa-check mr-1"></i> Unlimited Products
@@ -85,35 +127,118 @@
                                             <span class="inline-flex items-center px-2 py-1 text-xs bg-green-200 text-green-800 rounded-full">
                                                 <i class="fas fa-check mr-1"></i> Priority Support
                                             </span>
+                                            <span class="inline-flex items-center px-2 py-1 text-xs bg-green-200 text-green-800 rounded-full">
+                                                <i class="fas fa-check mr-1"></i> Batch Management
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        @elseif($user->is_subscribed && !$user->is_admin_approved)
-                            <div class="bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-lg border-l-4 border-yellow-400 shadow-sm transition-all duration-300 hover:shadow-md">
+                        @elseif($user->subscription_status === 'grace_period')
+                            <div class="bg-gradient-to-r from-yellow-50 to-amber-50 p-6 rounded-lg border-l-4 border-yellow-400 shadow-sm transition-all duration-300 hover:shadow-md">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0">
                                         <div class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 shadow-sm animate-pulse">
-                                            <i class="fas fa-clock text-xl text-yellow-600"></i>
+                                            <i class="fas fa-exclamation-triangle text-xl text-yellow-600"></i>
                                         </div>
                                     </div>
                                     <div class="ml-4 flex-1">
                                         <h4 class="text-lg font-semibold text-yellow-800 flex items-center">
-                                            <span>Subscription Pending Approval</span>
-                                            <span class="ml-2 px-2 py-1 text-xs bg-yellow-200 text-yellow-800 rounded-full animate-pulse">PENDING</span>
+                                            <span>Subscription Grace Period</span>
+                                            <span class="ml-2 px-2 py-1 text-xs bg-yellow-200 text-yellow-800 rounded-full animate-pulse">ACTION REQUIRED</span>
                                         </h4>
-                                        <p class="mt-1 text-sm text-yellow-700">Your subscription request is being reviewed by our team. You'll be notified when approved.</p>
-                                        <div class="mt-3 bg-yellow-100 p-3 rounded-md">
-                                            <p class="text-xs text-yellow-800">
-                                                <i class="fas fa-info-circle mr-1"></i>
-                                                Submitted on {{ $user->updated_at->format('F j, Y \a\t g:i A') }} • Typical processing time: 1-2 business days
-                                            </p>
+                                        <p class="mt-1 text-sm text-yellow-700">Your subscription has expired, but you still have access to premium features for a limited time.</p>
+                                        
+                                        <div class="mt-3 flex items-center">
+                                            <div class="flex-shrink-0">
+                                                <div class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-yellow-200">
+                                                    <i class="fas fa-hourglass-half text-sm text-yellow-700 animate-pulse"></i>
+                                                </div>
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm text-yellow-800">
+                                                    <strong>Grace period ends soon</strong>
+                                                </p>
+                                                <p class="text-xs text-yellow-700">
+                                                    Please renew your subscription to avoid service interruption
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-4 flex flex-wrap gap-2">
+                                            <span class="inline-flex items-center px-2 py-1 text-xs bg-yellow-200 text-yellow-800 rounded-full">
+                                                <i class="fas fa-exclamation-circle mr-1"></i> Limited Time Access
+                                            </span>
+                                            <span class="inline-flex items-center px-2 py-1 text-xs bg-yellow-200 text-yellow-800 rounded-full">
+                                                <i class="fas fa-exclamation-circle mr-1"></i> Renewal Required
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="mt-4">
+                                            <a href="#renewal-section" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-700 hover:to-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-all duration-200 transform hover:scale-105">
+                                                <i class="fas fa-sync-alt mr-2"></i>
+                                                Renew Subscription Now
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        @elseif($user->subscription_status === 'pending')
+                            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border-l-4 border-blue-400 shadow-sm transition-all duration-300 hover:shadow-md">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <div class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 shadow-sm animate-pulse">
+                                            <i class="fas fa-clock text-xl text-blue-600"></i>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4 flex-1">
+                                        <h4 class="text-lg font-semibold text-blue-800 flex items-center">
+                                            <span>Subscription Request Pending</span>
+                                            <span class="ml-2 px-2 py-1 text-xs bg-blue-200 text-blue-800 rounded-full animate-pulse">UNDER REVIEW</span>
+                                        </h4>
+                                        <p class="mt-1 text-sm text-blue-700">Your subscription request is being reviewed by our team. You'll be notified when approved.</p>
+                                        
+                                        <div class="mt-3">
+                                            <div class="w-full bg-blue-200 rounded-full h-2.5">
+                                                <div class="bg-blue-600 h-2.5 rounded-full w-1/2 animate-pulse"></div>
+                                            </div>
+                                            <p class="mt-1.5 text-xs text-blue-700 text-center">
+                                                Request processing
+                                            </p>
+                                        </div>
+                                        
+                                        <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div class="bg-blue-100 p-3 rounded-md border border-blue-200">
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-calendar-alt text-blue-600 mr-2 text-sm"></i>
+                                                    <div>
+                                                        <p class="text-xs font-medium text-blue-800">Submitted</p>
+                                                        <p class="text-xs text-blue-700">{{ $user->updated_at->format('M j, Y \a\t g:i A') }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="bg-blue-100 p-3 rounded-md border border-blue-200">
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-hourglass-half text-blue-600 mr-2 text-sm animate-pulse"></i>
+                                                    <div>
+                                                        <p class="text-xs font-medium text-blue-800">Estimated Approval</p>
+                                                        <p class="text-xs text-blue-700">1-2 business days</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        @if($user->subscription_notes)
+                                            <div class="mt-4 bg-blue-50 p-3 rounded-md border border-blue-200">
+                                                <p class="text-xs font-medium text-blue-800">Your Request Note:</p>
+                                                <p class="text-xs text-blue-700 mt-1">{{ $user->subscription_notes }}</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
                         @else
-                            <div class="bg-gradient-to-r from-gray-50 to-blue-50 p-6 rounded-lg border-l-4 border-gray-400 shadow-sm transition-all duration-300 hover:shadow-md">
+                            <div class="bg-gradient-to-r from-gray-50 to-slate-50 p-6 rounded-lg border-l-4 border-gray-400 shadow-sm transition-all duration-300 hover:shadow-md">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0">
                                         <div class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-gray-100 shadow-sm">
@@ -126,6 +251,23 @@
                                             <span class="ml-2 px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded-full">LIMITED</span>
                                         </h4>
                                         <p class="mt-1 text-sm text-gray-600">You have access to basic features. Upgrade to premium for full capabilities.</p>
+                                        
+                                        <div class="mt-3 flex items-center">
+                                            <div class="flex-shrink-0">
+                                                <div class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-gray-200">
+                                                    <i class="fas fa-star-half-alt text-sm text-gray-700"></i>
+                                                </div>
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm text-gray-800">
+                                                    <strong>Basic Features Only</strong>
+                                                </p>
+                                                <p class="text-xs text-gray-700">
+                                                    Upgrade to access premium features
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
                                         <div class="mt-3 flex flex-wrap gap-2">
                                             <span class="inline-flex items-center px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded-full">
                                                 <i class="fas fa-times mr-1"></i> Limited Products
@@ -137,6 +279,13 @@
                                                 <i class="fas fa-times mr-1"></i> Standard Support
                                             </span>
                                         </div>
+                                        
+                                        <div class="mt-4">
+                                            <a href="#upgrade-section" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:scale-105">
+                                                <i class="fas fa-crown mr-2"></i>
+                                                Upgrade to Premium
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -145,7 +294,7 @@
 
                     <!-- Action Section -->
                     <div class="border-t border-gray-200 pt-6 mb-8 animate-fade-in" style="animation-delay: 0.2s">
-                        @if($user->is_subscribed && $user->is_admin_approved)
+                        @if($user->subscription_status === 'active')
                             <div class="bg-white p-6 rounded-lg border border-red-200 shadow-sm">
                                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                     <div>
@@ -169,7 +318,7 @@
                                     </form>
                                 </div>
                             </div>
-                        @elseif($user->is_subscribed && !$user->is_admin_approved)
+                        @elseif($user->subscription_status === 'pending')
                             <div class="bg-white p-6 rounded-lg border border-yellow-200 shadow-sm">
                                 <div>
                                     <h4 class="text-lg font-semibold text-gray-900 flex items-center">
